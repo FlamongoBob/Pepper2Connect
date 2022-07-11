@@ -1,12 +1,14 @@
 package com.example.pepper2connect.messages;
 
-public enum messageType {
+public enum MessageType {
     Login
+    , LogOut
+    , User
     , Connect
     , Disconnect
     , System
-    , Unsuccessful_Login
-    , Successful_Login
+    , Unsuccessful_LogIn
+    , Successful_LogIn
     , Patient
     , Error
     , Test;

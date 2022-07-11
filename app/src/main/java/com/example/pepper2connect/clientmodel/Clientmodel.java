@@ -39,13 +39,12 @@ public class Clientmodel {
     }
 
 
-
     // Create an interface to respond with the result after processing
     public interface OnProcessedListener {
         void onProcessed(Message msg);
     }
 
-    public void StartServer(boolean isClientConnected,String strUserName, String strPassword, String strIpAddress, int intPort) {
+    public void StartServer(boolean isClientConnected, String strUserName, String strPassword, String strIpAddress, int intPort) {
 
         listener = new OnProcessedListener() {
             @Override
@@ -59,24 +58,34 @@ public class Clientmodel {
 
                         if (msg instanceof MessageSystem) {
 
-                            if(msg.getType().equals(messageType.Disconnect)){
+                            controller.appendSystemMessage2EditText((MessageSystem) msg);
 
-                            }else if(msg.getType().equals(messageType.Unsuccessful_Login)){
+                            if (msg.getType().equals(MessageType.Disconnect)) {
+                                controller.disconnectFromPepper((MessageSystem) msg);
 
-                            }else if(msg.getType().equals(messageType.Successful_Login)){
+                            } else if (msg.getType().equals(MessageType.Unsuccessful_LogIn)) {
+                                controller.disconnectFromPepper((MessageSystem) msg);
 
-                            }else if(msg.getType().equals(messageType.System)){
+                            } else if (msg.getType().equals(MessageType.Successful_LogIn)) {
+                                controller.clientSuccessfulLogin((MessageSystem) msg);
 
-                            }else if(msg.getType().equals(messageType.Patient)){
+                            } else if (msg.getType().equals(MessageType.LogOut)) {
+                                controller.disconnectFromPepper((MessageSystem) msg);
 
+                            } else if (msg.getType().equals(MessageType.System)) {
+
+                            } else if (msg.getType().equals(MessageType.Patient)) {
+
+                            } else if (msg.getType().equals(MessageType.User)) {
+                                controller.fillCurrentUser((MessageUser) msg);
+
+                            }else if (msg.getType().equals(MessageType.Error)) {
+                                controller.showLoginStatusInformation(msg);
+
+                            }else if (msg.getType().equals(MessageType.Test)) {
+                                controller.appendSystemMessage2EditText((MessageSystem) msg);
                             }
-                        } /*else if (msg instanceof messageSystem) {
-
-                        } else if (msg instanceof messageConnect) {
-
-                        } else if (msg instanceof messageDisconnect) {
-
-                        }*/
+                        }
 
                         // If we're done with the ExecutorService, shut it down.
                         // (If you want to re-use the ExecutorService, make sure to shut it down whenever everything's completed and you don't need it any more.)
@@ -99,13 +108,13 @@ public class Clientmodel {
                  *                   with Boolean True -->  Connected to Server,  message to User
                  */
                 MessageSystem msgSys = new MessageSystem("Connecting");
-                msgSys.setType(messageType.Connect);
+                msgSys.setType(MessageType.Connect);
                 //msgSys.setBoolean(false);
 
                 listener.onProcessed(msgSys);
 
                 try {
-                    if(socket != null) {
+                    if (socket != null) {
                         socket = new Socket(strIpAddress, intPort);
                     }
                     controller.isClientConnected = true;
@@ -114,9 +123,9 @@ public class Clientmodel {
 
                         Message msg = Message.receive(socket);
 
-                        if(msg.getType().equals(messageType.Test)){
+                        if (msg.getType().equals(MessageType.Test)) {
                             responseTimer();
-                        }else {
+                        } else {
                             listener.onProcessed(msg);
                         }
 
@@ -129,18 +138,10 @@ public class Clientmodel {
                     String err = e.getMessage();
                     err += "";
 
-                    /* Controlle Show as Error when Login
-                    messageSystem msgSysError = new messageSystem();
-                    msgSysError.setType(messageType.Error);
-                    msgSysError.setStrSystemNotification(" Could not Connect to the Server, \" +\n"
-                            + "\"Please try again! +\n"
-                            + "Error Message: +\n" + err);
-                    listener.onProcessed(msgSysError);*/
-/*
-            controller.appendTextToChat("Could not Connect to the Server, " +
-                            "Please try again or try a different Server"
-                    , Controller.eTextType.System);
-*/
+                    // Controlle Show as Error when Login
+                    MessageSystem msgSysError = new MessageSystem(" Could not Connect to the Server! \n Please try again!");
+                    msgSysError.setType(MessageType.Error);
+                    listener.onProcessed(msgSysError);
                 }
 
 
@@ -149,30 +150,33 @@ public class Clientmodel {
 
         mExecutor.execute(backgroundRunnable);
     }
-    private void Login(String strUserName, String strPassword){
 
-        if(!controller.isLoggedIn){
-            MessageLogin msgLogin = new MessageLogin(strUserName, strPassword,messageType.Login);
+    private void Login(String strUserName, String strPassword) {
+
+        if (!controller.isLoggedIn) {
+            MessageLogin msgLogin = new MessageLogin(strUserName, strPassword, MessageType.Login);
             msgLogin.send(socket);
         }
     }
 
     public void disconnect() {
         MessageSystem msgSysDisconnect = new MessageSystem("Disconnecting");
-        msgSysDisconnect.setType(messageType.Disconnect);
+        msgSysDisconnect.setType(MessageType.Disconnect);
         msgSysDisconnect.send(socket);
 
-        controller.isClientConnected =false;
+        controller.isClientConnected = false;
+        controller.isLoggedIn = false;
         mExecutor.shutdown();
     }
+
     public void responseTimer() {
         MessageSystem msgSysTimer = new MessageSystem("Response Time");
-        msgSysTimer.setType(messageType.Test);
+        msgSysTimer.setType(MessageType.Test);
         msgSysTimer.send(socket);
     }
 
-    public void sendMessage(Message message){
-        if(message!=null){
+    public void sendMessage(Message message) {
+        if (message != null) {
             message.send(socket);
         }
     }

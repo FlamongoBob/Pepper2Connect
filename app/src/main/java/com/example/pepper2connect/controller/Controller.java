@@ -1,81 +1,200 @@
 package com.example.pepper2connect.controller;
 
-import android.app.Activity;
+import android.graphics.Color;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.example.pepper2connect.Model.User;
 import com.example.pepper2connect.client.Client;
+import com.example.pepper2connect.messages.Message;
 import com.example.pepper2connect.messages.MessageSystem;
-import com.example.pepper2connect.messages.messageType;
+import com.example.pepper2connect.messages.MessageType;
+import com.example.pepper2connect.messages.MessageUser;
 
 import java.text.SimpleDateFormat;
-import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class Controller {
-    public static volatile Boolean isClientConnected = false;
+    public static volatile Boolean isClientConnected = true;
     public static volatile Boolean isLoggedIn = true;
     private Client client;
-    protected Activity runningActivity;
-    EditText etLogServerCon;
-    String strUsername="Test";
+
+    final private String strServerIP = "127.10.10.15";
+    final private int intPort = 10284;
+
+    private User currentUser;
+
+    EditText etLogServerCon, etPatientInformation, etLoginPassword, etLoginUserName, etProfileFirstName, etProfileTitle, etProfileLastName;
+
+    String strUsername = "Test";
+
+    TextView tvLoginInformation;
 
 
-    public Controller(){
+    public Controller() {
 
     }
 
-    public void connect2Peppper(String strIPAddress, int intPort, String strUsername, String strPassword){
-        this.strUsername = strUsername;
-        client = new Client(strIPAddress, intPort, strUsername,strPassword,this);
+    public void connect2Peppper(String strUsername, String strPassword) {
 
+        if (strUsername != null) {
+            if (!strUsername.isEmpty()) {
+                if (strPassword != null) {
+                    if (!strPassword.isEmpty()) {
+                        this.strUsername = strUsername;
+
+                        try {
+                            client = new Client(this.strServerIP, this.intPort, strUsername, strPassword, this);
+                        } catch (Exception ex) {
+                            String err = "";
+                            err = ex.getMessage();
+
+                            strUsername = "";
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    public void disconnectFromPepper(){
-        if(client!= null && isClientConnected){
+    /**
+     * Fragment_Login
+     */
+
+    public void clientSuccessfulLogin(MessageSystem msgSys) {
+        showLoginStatusInformation(msgSys);
+        isLoggedIn = true;
+    }
+
+    public void disconnectFromPepper(MessageSystem msgSys) {
+        if (client != null && isClientConnected) {
+            showLoginStatusInformation(msgSys);
+
+            appendSystemMessage2EditText(msgSys);
             client.disconnect();
         }
     }
-    public void testServerConnection(){
-        String strLogMessage="";
 
-        if(isClientConnected){
-            MessageSystem msgSysTest = new MessageSystem("");
-            msgSysTest.setType(messageType.Test);
-            //client.sendSysMessage(msgSysTest);
-            appendText2Log(msgSysTest);
-        }
-    }
+    public void showLoginStatusInformation(Message msgSys) {
+        if (tvLoginInformation != null) {
+            switch (msgSys.getType()) {
+                case LogOut:
+                    tvLoginInformation.setText("You have Successfully logged out. \n Have a nice day!");
+                    tvLoginInformation.setTextColor(Color.parseColor("#FF000000"));
+                    break;
+                case Unsuccessful_LogIn:
+                    tvLoginInformation.setText("Username or Password incorrect, please try again.");
+                    tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
+                    break;
+                case Successful_LogIn:
+                    tvLoginInformation.setText("You have successfully Logged in!.");
+                    tvLoginInformation.setTextColor(Color.parseColor("#00B612"));
+                    break;
+                case Error:
+                    String strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
+                    tvLoginInformation.setText(strMessage);
+                    tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
+                    break;
 
-    private void appendText2Log(MessageSystem messageSystem){
-        if(etLogServerCon!=null){
-            String strAppendString="";
-            etLogServerCon.append("\n");
-            String strCurrentDateTime = getDateTime();
-
-            String strLoginStatus="";
-            if (!isClientConnected){
-                strLoginStatus = " not";
             }
-            strAppendString =strUsername+ "is currently"+strLoginStatus+" connected \n"
-                    +"Last Message received: \n"+getDateTime()+"\n Messagetype: \n" + messageSystem.getType().toString();
-            etLogServerCon.append(strAppendString);
+        }
+    }
 
+    /**
+     * Fragment_Server
+     */
+
+
+    public void testServerConnection() {
+        if (isClientConnected) {
+            MessageSystem msgSysTest = new MessageSystem("");
+            msgSysTest.setType(MessageType.Test);
+
+            //client.sendSysMessage(msgSysTest);
+
+            appendSystemMessage2EditText(msgSysTest);
+        }
+    }
+
+    public void appendSystemMessage2EditText(MessageSystem messageSystem) {
+        if (messageSystem.getType().toString().equals(MessageType.Patient.toString())) {
+            String strAppendString = messageSystem.getStrSystemNotification();
+            appendText2EditText(strAppendString, etPatientInformation);
         }
 
+        if (etLogServerCon != null) {
+            String strAppendString = "";
+            String strLoginStatus = "";
+            if(isClientConnected) {
+                if (!isLoggedIn) {
+                    strLoginStatus = " not";
+                }
+
+                if (messageSystem.getType().toString().equals(MessageType.Successful_LogIn.toString())) {
+
+                    strAppendString = strUsername + "is currently" + strLoginStatus + " connected and logged in. \n";
+                }
+
+                strAppendString += "Last Messagetype received: \n" + messageSystem.getType().toString();
+            }else {
+                strAppendString = "Cannot perform Test if App is not Connected to the Server";
+            }
+
+            appendText2EditText(strAppendString, etLogServerCon);
+
+        }
     }
-    public String getDateTime(){
+
+    /**
+     * General
+     */
+
+    public void fillCurrentUser(MessageUser msgU) {
+        currentUser = new User(msgU.getIntUserID(), msgU.getStrTitle(), msgU.getStrFirstname(), msgU.getStrLastname());
+    }
+
+    private void appendText2EditText(String strAppendText, EditText etAppend) {
+        if (etAppend != null) {
+            etAppend.append("\n");
+            etAppend.append("-------------");
+            etAppend.append("\n");
+            etAppend.append(getDateTime());
+            etAppend.append("\n");
+            etAppend.append(strAppendText);
+            etAppend.append("\n");
+            etAppend.append("-------------");
+        }
+    }
+
+    public String getDateTime() {
         Date currentDateTime = Calendar.getInstance().getTime();
         System.out.println("Current time => " + currentDateTime);
 
-        //SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
-       // String formattedDate = df.format(c);
-        return currentDateTime.toString();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy - HH:mm", Locale.getDefault());
+        String formattedDate = df.format(currentDateTime);
+        return formattedDate;
     }
 
     public void setEtLogServerCon(EditText etLogServerCon) {
         this.etLogServerCon = etLogServerCon;
+    }
+
+    public void setEtPatientInformation(EditText etPatientInformation) {
+        this.etPatientInformation = etPatientInformation;
+    }
+
+    public void setEtLoginUsername(EditText etLoginUserName) {
+        this.etLoginUserName = etLoginUserName;
+
+    }
+
+    public void setEtLoginPassword(EditText etPassword) {
+        this.etLoginPassword = etPassword;
+    }
+
+    public void setTvLoginInformation(TextView tvLoginInformation) {
+        this.tvLoginInformation = tvLoginInformation;
     }
 }

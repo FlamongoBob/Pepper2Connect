@@ -15,11 +15,11 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.NoSuchPaddingException;
 
 public abstract class Message {
-    protected messageType type;
+    protected MessageType type;
     private boolean value;
     private static Encryption encryption;
     private static Decryption decryption;
-    public Message(messageType type) {
+    public Message(MessageType type) {
         this.type = type;
 
         encryption = new Encryption();
@@ -66,21 +66,40 @@ public abstract class Message {
                 // Parse message
                 String[] parts = strDecryptedMessage.split("\\|");
 
-                message = new MessageSystem(parts[1]);
-                if (parts[0].equals(messageType.Disconnect.toString())) {
-                    message.setType(messageType.Disconnect);
-                } else if (parts[0].equals(messageType.Unsuccessful_Login.toString())) {
-                    message.setType(messageType.Unsuccessful_Login);
-                } else if (parts[0].equals(messageType.Successful_Login.toString())) {
-                    message.setType(messageType.Successful_Login);
-                } else if (parts[0].equals(messageType.Disconnect.toString())) {
-                    message.setType(messageType.Disconnect);
-                } else if (parts[0].equals(messageType.Patient.toString())) {
-                    message.setType(messageType.Patient);
-                } else if (parts[0].equals(messageType.System.toString())) {
-                    message.setType(messageType.System);
-                } else if (parts[0].equals(messageType.Test.toString())) {
-                    message.setType(messageType.Test);
+                if (parts[0].equals(MessageType.Disconnect.toString())) {
+                    message = new MessageSystem(parts[1]);
+                    message.setType(MessageType.Disconnect);
+
+                } else if (parts[0].equals(MessageType.Unsuccessful_LogIn.toString())) {
+                    message = new MessageSystem(parts[1]);
+                    message.setType(MessageType.Unsuccessful_LogIn);
+
+                } else if (parts[0].equals(MessageType.Successful_LogIn.toString())) {
+                    message = new MessageSystem(parts[1]);
+                    message.setType(MessageType.Successful_LogIn);
+
+                }else if (parts[0].equals(MessageType.LogOut.toString())) {
+                    message.setType(MessageType.LogOut);
+
+                } else if (parts[0].equals(MessageType.Disconnect.toString())) {
+                    message = new MessageSystem(parts[1]);
+                    message.setType(MessageType.Disconnect);
+
+                } else if (parts[0].equals(MessageType.Patient.toString())) {
+                    message = new MessageSystem(parts[1]);
+                    message.setType(MessageType.Patient);
+
+                } else if (parts[0].equals(MessageType.System.toString())) {
+                    message = new MessageSystem(parts[1]);
+                    message.setType(MessageType.System);
+
+                } else if (parts[0].equals(MessageType.Test.toString())) {
+                    message = new MessageSystem(parts[1]);
+                    message.setType(MessageType.Test);
+
+                } else if (parts[0].equals(MessageType.User.toString())) {
+                    message = new MessageUser(Integer.parseInt(parts[1]),parts[2],parts[3],parts[4]);
+                    message.setType(MessageType.User);
                 }
             }
         } catch (IOException e) {
@@ -98,12 +117,13 @@ public abstract class Message {
     /**
      * Returns the type of the Message
      */
-    public messageType getType() {
+    public MessageType getType() {
         return this.type;
     }
-    public void setType(messageType msgType){
+    public void setType(MessageType msgType){
         this.type = msgType;
     }
+
 
     public boolean getBoolean() {
         return value;

@@ -5,7 +5,7 @@ public class MessageLogin extends Message {
     private String strName;
     private String strPassword;
 
-    public MessageLogin(String strName, String strPassword, messageType messageType) {
+    public MessageLogin(String strName, String strPassword, MessageType messageType) {
         super(messageType);//MessageType.CreatePlayer);
 
         this.strName = strName;

@@ -5,13 +5,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pepper2connect.controller.Controller;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     Fragment active = frgLogin;
 
     Button btnTestConnection, btnLogin;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
                                 active = frgLogin;
                                 if(!isCreatedLogin) {
                                     initiateCreateLogin();
-                                    initiateCreateServer();
                                 }
                                 return true;
                             }
@@ -154,13 +155,8 @@ public class MainActivity extends AppCompatActivity {
     public void initiateCreateServer() {
         try {
             btnTestConnection = findViewById(R.id.btnTestConnection);
-            btnTestConnection.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    controller.testServerConnection();
-                }
-            });
-
+            btnTestConnection.setOnClickListener(view -> controller.testServerConnection());
+            controller.setEtLogServerCon(findViewById(R.id.etLogServerCon));
             isCreatedServer = true;
         } catch (Exception ex) {
             String err = "";
@@ -170,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void initiateCreatePatient(){
         try {
-
+            controller.setEtPatientInformation(findViewById(R.id.etPatientInformation));
             isCreatedPatient = true;
         }catch (Exception ex){
             String err = "";
@@ -180,6 +176,9 @@ public class MainActivity extends AppCompatActivity {
     }
     public void initiateCreateProfile() {
         try {
+            EditText etFirstName = findViewById(R.id.etProfileFirstName);
+            EditText etLastName = findViewById(R.id.etProfileLastName);
+
 
             isCreatedProfile = true;
         } catch (Exception ex) {
@@ -195,7 +194,14 @@ public class MainActivity extends AppCompatActivity {
             btnLogin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //controller.connect2Peppper();
+                    EditText etLoginUserName = findViewById(R.id.etLoginUserName);
+                    controller.setEtLoginUsername(etLoginUserName);
+                    EditText etLoginPassword = findViewById(R.id.etLoginPassword);
+                    controller.setEtLoginPassword(etLoginPassword);
+                    TextView tvLoginInformation = findViewById(R.id.tvLoginInformation);
+                    controller.setTvLoginInformation(tvLoginInformation);
+
+                    controller.connect2Peppper(etLoginUserName.getText().toString(),etLoginPassword.getText().toString());
                 }
             });
             isCreatedLogin = true;
