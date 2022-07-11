@@ -1,10 +1,10 @@
 package com.example.pepper2connect.messages;
 
-public class messageSystem extends Message {
+public class MessageSystem extends Message {
 
 
     private String strSystemNotification;
-    public messageSystem(String strSystemNotification){
+    public MessageSystem(String strSystemNotification){
         super(messageType.System);
         this.strSystemNotification = strSystemNotification;
     }
@@ -15,6 +15,9 @@ public class messageSystem extends Message {
     public void setStrSystemNotification(String strSystemNotification) {
         this.strSystemNotification = strSystemNotification;
     }
-
+    @Override
+    public String toString() {
+        return type.toString() + '|' + strSystemNotification;
+    }
 
 }

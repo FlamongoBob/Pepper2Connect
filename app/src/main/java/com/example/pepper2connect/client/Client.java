@@ -37,17 +37,18 @@ public class Client {
         cModel.disconnect();
     }
 
-    /*
+
 
     /**
      * Sending Chatmessages
-     * @param chatMessage
+     * @param messageSystem
+     *
+     */
+    public void sendSysMessage(MessageSystem messageSystem) {
 
-    public void SendMessage(ChatMessage chatMessage) {
-
-        cModel.sendMessage(chatMessage);
+        cModel.sendMessage(messageSystem);
     }
-
+    /*
 
     /**
      * Sending Player messages

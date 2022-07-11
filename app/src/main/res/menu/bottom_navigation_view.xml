@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_Login"
+        android:title="Person"
+        android:icon="@drawable/ic_login_48"/>
+    <item
+        android:id="@+id/navigation_PatientInformation"
+        android:title="Patient"
+        android:icon="@drawable/ic_patient_48"/>
+    <item
+        android:id="@+id/navigation_Profile"
+        android:title="Profile"
+        android:icon="@drawable/ic_badge_48"/>
+    <item
+        android:id="@+id/navigation_ServerConnection"
+        android:title="Server"
+        android:icon="@drawable/ic_server_48"/>
+    <item
+        android:id="@+id/navigation_Logout"
+        android:title="Logout"
+        android:icon="@drawable/ic_logout_48"/>
+</menu>

@@ -1,11 +1,11 @@
 package com.example.pepper2connect.messages;
 
-public class messageLogin extends Message {
+public class MessageLogin extends Message {
 
     private String strName;
     private String strPassword;
 
-    public messageLogin(String strName, String strPassword, messageType messageType) {
+    public MessageLogin(String strName, String strPassword, messageType messageType) {
         super(messageType);//MessageType.CreatePlayer);
 
         this.strName = strName;

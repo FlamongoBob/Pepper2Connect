@@ -9,6 +9,6 @@ public enum messageType {
     , Successful_Login
     , Patient
     , Error
-    , Timer;
+    , Test;
 }
 

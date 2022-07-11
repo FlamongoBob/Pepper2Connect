@@ -57,7 +57,7 @@ public class Clientmodel {
                         // Update the UI here
                         //updateUi(result);
 
-                        if (msg instanceof messageSystem) {
+                        if (msg instanceof MessageSystem) {
 
                             if(msg.getType().equals(messageType.Disconnect)){
 
@@ -98,7 +98,7 @@ public class Clientmodel {
                  * @param msgConnect with Boolean false --> Trying to Connect, message to User
                  *                   with Boolean True -->  Connected to Server,  message to User
                  */
-                messageSystem msgSys = new messageSystem("Connecting");
+                MessageSystem msgSys = new MessageSystem("Connecting");
                 msgSys.setType(messageType.Connect);
                 //msgSys.setBoolean(false);
 
@@ -114,7 +114,7 @@ public class Clientmodel {
 
                         Message msg = Message.receive(socket);
 
-                        if(msg.getType().equals(messageType.Timer)){
+                        if(msg.getType().equals(messageType.Test)){
                             responseTimer();
                         }else {
                             listener.onProcessed(msg);
@@ -152,13 +152,13 @@ public class Clientmodel {
     private void Login(String strUserName, String strPassword){
 
         if(!controller.isLoggedIn){
-            messageLogin msgLogin = new messageLogin(strUserName, strPassword,messageType.Login);
+            MessageLogin msgLogin = new MessageLogin(strUserName, strPassword,messageType.Login);
             msgLogin.send(socket);
         }
     }
 
     public void disconnect() {
-        messageSystem msgSysDisconnect = new messageSystem("Disconnecting");
+        MessageSystem msgSysDisconnect = new MessageSystem("Disconnecting");
         msgSysDisconnect.setType(messageType.Disconnect);
         msgSysDisconnect.send(socket);
 
@@ -166,143 +166,16 @@ public class Clientmodel {
         mExecutor.shutdown();
     }
     public void responseTimer() {
-        messageSystem msgSysTimer = new messageSystem("Response Time");
-        msgSysTimer.setType(messageType.Timer);
+        MessageSystem msgSysTimer = new MessageSystem("Response Time");
+        msgSysTimer.setType(messageType.Test);
         msgSysTimer.send(socket);
     }
 
-
-/*
-    public void connect(String ipAddress, int Port, String name, String password) {
-        // logger.info("Connect");
-        this.name = name;
-        this.password = password;
-        try {
-            socket = new Socket(ipAddress, Port);
-
-            // controller.isClientConnected.setBoolean(true);
-
-
-            // Create thread to read incoming messages
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    new Thread() {
-                    while(isClientConnected)
-
-                        {
-
-                            message msg = message.receive(socket);
-
-                            if (msg instanceof messageLogin) {
-                                //controller.appendTextToChat(((ChatMessage) msg).getContent(), ((ChatMessage) msg).getName());
-
-                            } else if (msg instanceof messageLogin) {
-                                //controller.appendTextToChat("You entered the wrong password, please try again.",(Controller.eTextType.System));
-
-/*
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //controller.alertMessage("Incorrect Password", "Enter Correct Password", Alert.AlertType.WARNING);
-
-                                }
-                            });
-
-
-                            } else if (msg instanceof messageLogin) {
-                                //controller.appendTextToChat(((DisconnectMessage) msg).getStrUsername() +" Has disconnected, please try to reconnect" +
-                                //        " or try to connect to another server",Controller.eTextType.System);
-                            /*
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //controller.ClientServerHasShutDown();
-                                }
-                            });
-
-                                // closeSocket();
-
-
-                            } else if (msg instanceof messageLogin) {
-                                if (msg.getType().equals(messageType.Start)) {
-                                    //controller.ClientCleanPlayfield();
-                                } else if (msg.getType().equals(messageType.End)) {
-                                    //controller.appendTextToChat("Press New Game to Start a New Game", Controller.eTextType.System);
-                                    // controller.ClientShowWinner();
-
-                                } else if (msg.getType().equals(messageType.Tie)) {
-                                    // controller.ClientENDOFGAMEBlockButtons();
-                                    //controller.appendTextToChat("It's a Tie", Controller.eTextType.System);
-
-                                } else if (msg.getType().equals(messageType.NewGame)) {
-                                    //controller.ClientCleanPlayfield();
-                                }
-
-                            } else if (msg instanceof messageLogin) {
-                                if (msg.getType().equals(messageType.CreatePlayer)) {
-
-                                    //controller.ClientPlayerCreation(((PlayerMsg) msg).getName(), ((PlayerMsg) msg).getID());
-                                }
-                                if (msg.getType().equals(messageType.PlayerTurn)) {
-
-                                    //    controller.ClientSetCurrentPlayer(new Player(((PlayerMsg) msg).getName(), ((PlayerMsg) msg).getID()));
-                                    //
-                                    // controller.setCurrentPlayer(((PlayerMsg) msg).getID());
-                                    //
-                                }
-
-                            } else if (msg instanceof messageLogin) {
-                                // controller.setButtonOwner(((ButtonMessage) msg).getPressedID());
-                            /*
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                    //controller.ClientSetButtonOwner(((ButtonMessage) msg).getPressedID());
-                                    // OLD
-                                    //controller.getPressedID.set(((ButtonMessage) msg).getPressedID());
-                                }
-                            });
-
-                            } else if (msg instanceof messageLogin) {
-
-                                new Handler().post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Code here will run in UI thread
-                                    }
-                                });
-
-                            }
-
-                        }
-                    }.start();
-                }
-            };
-            t = new Thread(r);
-            t.start();
-
-            // Send join message to the server
-            message msg = new JoinMsg(this.name, this.password);
-            msg.send(socket);
-
-        } catch (Exception e) {
-            // logger.warning(e.toString());
-
-            //controller.ClientIsConnected.set(false);
-            String err = e.getMessage();
-            err += "";
-
-/*
-            controller.appendTextToChat("Could not Connect to the Server, " +
-                            "Please try again or try a different Server"
-                    , Controller.eTextType.System);
-
+    public void sendMessage(Message message){
+        if(message!=null){
+            message.send(socket);
         }
-
     }
-    */
 
 
 }

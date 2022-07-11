@@ -66,45 +66,22 @@ public abstract class Message {
                 // Parse message
                 String[] parts = strDecryptedMessage.split("\\|");
 
+                message = new MessageSystem(parts[1]);
                 if (parts[0].equals(messageType.Disconnect.toString())) {
-                    message = new messageSystem((String) parts[1]);
                     message.setType(messageType.Disconnect);
                 } else if (parts[0].equals(messageType.Unsuccessful_Login.toString())) {
-                    message = new messageSystem(parts[1]);
                     message.setType(messageType.Unsuccessful_Login);
                 } else if (parts[0].equals(messageType.Successful_Login.toString())) {
-                    message = new messageSystem(parts[1]);
                     message.setType(messageType.Successful_Login);
                 } else if (parts[0].equals(messageType.Disconnect.toString())) {
-                    message = new messageSystem(parts[1]);
                     message.setType(messageType.Disconnect);
                 } else if (parts[0].equals(messageType.Patient.toString())) {
-                    message = new messageSystem(parts[1]);
                     message.setType(messageType.Patient);
                 } else if (parts[0].equals(messageType.System.toString())) {
-                    message = new messageSystem(parts[1]);
                     message.setType(messageType.System);
-                } else if (parts[0].equals(messageType.Timer.toString())) {
-                    message = new messageSystem(parts[1]);
-                    message.setType(messageType.Timer);
-                } /*else if (parts[0].equals(messageType.CreatePlayer.toString())) {
-                    message = new PlayerMsg(parts[1], Integer.parseInt(parts[2]), MessageType.CreatePlayer);
-                } else if (parts[0].equals(messageType.PlayerTurn.toString())) {
-                    message = new PlayerMsg(parts[1], Integer.parseInt(parts[2]), MessageType.PlayerTurn);
-                } else if (parts[0].equals(messageType.Button.toString())) {
-                    message = new ButtonMessage(Integer.parseInt(parts[1]));
-                } else if (parts[0].equals(messageType.NewGame.toString())) {
-                    message = new StartEndGameMessage(MessageType.NewGame);
-                } else if (parts[0].equals(messageType.End.toString())) {
-                    message = new StartEndGameMessage(MessageType.End);
-                }else if (parts[0].equals(messageType.Disconnect.toString())) {
-                    message = new DisconnectMessage(parts[1]);
-                }else if (parts[0].equals(messageType.IncorrectPW.toString())) {
-                    message = new IncorrectPwdMessage();
-                }else if (parts[0].equals(messageType.Card.toString())) {
-                    message = new CardsMessage(Integer.parseInt(parts[1]), parts[2]);
-                }*/
-
+                } else if (parts[0].equals(messageType.Test.toString())) {
+                    message.setType(messageType.Test);
+                }
             }
         } catch (IOException e) {
             logger.warning(e.toString());
