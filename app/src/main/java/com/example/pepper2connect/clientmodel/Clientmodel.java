@@ -54,11 +54,10 @@ public class Clientmodel {
                     @Override
                     public void run() {
                         // Update the UI here
-                        //updateUi(result);
 
                         if (msg instanceof MessageSystem) {
 
-                            controller.appendSystemMessage2EditText((MessageSystem) msg);
+                            controller.appendLogServerCon((MessageSystem) msg);
 
                             if (msg.getType().equals(MessageType.Disconnect)) {
                                 controller.disconnectFromPepper((MessageSystem) msg);
@@ -75,6 +74,7 @@ public class Clientmodel {
                             } else if (msg.getType().equals(MessageType.System)) {
 
                             } else if (msg.getType().equals(MessageType.Patient)) {
+                                controller.appendPatientInformation((MessageSystem) msg);
 
                             } else if (msg.getType().equals(MessageType.User)) {
                                 controller.fillCurrentUser((MessageUser) msg);
@@ -83,12 +83,12 @@ public class Clientmodel {
                                 controller.showLoginStatusInformation(msg);
 
                             }else if (msg.getType().equals(MessageType.Test)) {
-                                controller.appendSystemMessage2EditText((MessageSystem) msg);
+                                controller.appendLogServerCon((MessageSystem) msg);
                             }
                         }
 
                         // If we're done with the ExecutorService, shut it down.
-                        // (If you want to re-use the ExecutorService, make sure to shut it down whenever everything's completed and you don't need it any more.)
+                        // Shut it down whenever everything is completed and it is not needed anymore.)
                         if (!isClientConnected) {
                             mExecutor.shutdown();
                         }

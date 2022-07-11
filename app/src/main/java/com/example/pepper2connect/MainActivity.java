@@ -24,10 +24,10 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
     private Controller controller;
-    private boolean isCreatedPatient=false;
-    private boolean isCreatedLogin=false;
-    private boolean isCreatedProfile=false;
-    private boolean isCreatedServer=false;
+    private boolean isCreatedPatient = false;
+    private boolean isCreatedLogin = false;
+    private boolean isCreatedProfile = false;
+    private boolean isCreatedServer = false;
 
     Fragment frgLogin = new Fragment_Login();
     Fragment frgProfile = new Fragment_Profile();
@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         if (controller == null) {
             controller = new Controller();
         }
-        initiateControlls();
 
         try {
             alertDialogBuilder = new AlertDialog.Builder(this);
@@ -64,23 +63,27 @@ public class MainActivity extends AppCompatActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.navigation_Login:
-                            if (!active.getTag().equals("frgLogin")) {
+                            if (!active.getTag().equals(frgMng.findFragmentByTag("frgLogin").getTag())) {
                                 frgMng.beginTransaction().hide(active).show(frgLogin).commit();
                                 active = frgLogin;
-                                if(!isCreatedLogin) {
-                                    initiateCreateLogin();
+                                if (!isCreatedLogin) {
+                                    inititateLoginControls();
                                 }
                                 return true;
                             }
+                            break;
+
                         case R.id.navigation_PatientInformation:
-                            if (!active.getTag().equals("frgPatient")) {
+                            if (!active.getTag().equals(frgMng.findFragmentByTag("frgPatient").getTag())) {
                                 if (controller.isLoggedIn) {
                                     frgMng.beginTransaction().hide(active).show(frgPatient).commit();
                                     active = frgPatient;
 
-                                    if(!isCreatedPatient) {
-                                        initiateCreatePatient();
+                                    if (!isCreatedPatient) {
+                                        initiatePatientControls();
                                     }
+                                    controller.checkPatientInfoBuffer();
+
                                     return true;
                                 } else {
                                     alertDialogBuilder.setTitle("Not Logged In");
@@ -99,14 +102,15 @@ public class MainActivity extends AppCompatActivity {
                                 return false;
                             }
                         case R.id.navigation_Profile:
-                            if (!active.getTag().equals("frgProfile")) {
+                            if (!active.getTag().equals(frgMng.findFragmentByTag("frgProfile").getTag())) {
                                 if (controller.isLoggedIn) {
                                     frgMng.beginTransaction().hide(active).show(frgProfile).commit();
                                     active = frgProfile;
 
-                                    if(!isCreatedProfile) {
-                                        initiateCreateProfile();
+                                    if (!isCreatedProfile) {
+                                        initiateProfileControls();
                                     }
+                                    controller.fillProfile();
                                     return true;
                                 } else {
                                     alertDialogBuilder.setTitle("Not Logged In");
@@ -125,19 +129,43 @@ public class MainActivity extends AppCompatActivity {
                                 return false;
                             }
                         case R.id.navigation_ServerConnection:
-                            if (!active.getTag().equals("frgServer")) {
+                            if (!active.getTag().equals(frgMng.findFragmentByTag("frgServer").getTag())) {
 
                                 frgMng.beginTransaction().hide(active).show(frgServer).commit();
                                 active = frgServer;
 
-                                if(!isCreatedServer) {
-                                    initiateCreateServer();
+                                if (!isCreatedServer) {
+                                    initiateServerControls();
                                 }
+                                controller.checkLogServerConBuffer();
                                 return true;
 
                             } else {
                                 return false;
                             }
+                        case R.id.navigation_Logout:
+                            if(controller.isLoggedIn) {
+                                alertDialogBuilder.setTitle("Logout");
+                                alertDialogBuilder.setMessage("Are you sure, You wanted to Log out ?");
+                                alertDialogBuilder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface arg0, int arg1) {
+                                        Toast.makeText(MainActivity.this, "You will be Logged out now.", Toast.LENGTH_LONG).show();
+                                        controller.clientLogOut();
+                                    }
+                                });
+                                alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(MainActivity.this, "You will stay logged in.", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+
+                                alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
+                            }
+
+                            break;
                     }
                     return false;
                 }
@@ -148,15 +176,17 @@ public class MainActivity extends AppCompatActivity {
             err += "\n MEGA NOICE";
         }
     }
-    private void initiateControlls(){
 
-    }
-
-    public void initiateCreateServer() {
+    public void initiateServerControls() {
         try {
             btnTestConnection = findViewById(R.id.btnTestConnection);
             btnTestConnection.setOnClickListener(view -> controller.testServerConnection());
-            controller.setEtLogServerCon(findViewById(R.id.etLogServerCon));
+
+            EditText etLogServerCon = findViewById(R.id.etLogServerCon);
+            etLogServerCon.setFocusable(false);
+            etLogServerCon.setKeyListener(null);
+
+            controller.setEtLogServerCon(etLogServerCon);
             isCreatedServer = true;
         } catch (Exception ex) {
             String err = "";
@@ -164,20 +194,37 @@ public class MainActivity extends AppCompatActivity {
             isCreatedServer = false;
         }
     }
-    public void initiateCreatePatient(){
+
+    public void initiatePatientControls() {
         try {
-            controller.setEtPatientInformation(findViewById(R.id.etPatientInformation));
+            EditText etPatientInformation = findViewById(R.id.etPatientInformation);
+            etPatientInformation.setFocusable(false);
+            etPatientInformation.setKeyListener(null);
+            controller.setEtPatientInformation(etPatientInformation);
             isCreatedPatient = true;
-        }catch (Exception ex){
+        } catch (Exception ex) {
             String err = "";
             err = ex.getMessage();
             isCreatedPatient = false;
         }
     }
-    public void initiateCreateProfile() {
+
+    public void initiateProfileControls() {
         try {
-            EditText etFirstName = findViewById(R.id.etProfileFirstName);
-            EditText etLastName = findViewById(R.id.etProfileLastName);
+            EditText etProfileTitle = findViewById(R.id.etProfileTitle);
+            etProfileTitle.setKeyListener(null);
+            etProfileTitle.setFocusable(false);
+            controller.setEtProfileTitle(etProfileTitle);
+
+            EditText etProfileFirstName = findViewById(R.id.etProfileFirstName);
+            etProfileFirstName.setKeyListener(null);
+            etProfileFirstName.setFocusable(false);
+            controller.setEtProfileFirstName(etProfileFirstName);
+
+            EditText etProfileLastName = findViewById(R.id.etProfileLastName);
+            etProfileLastName.setKeyListener(null);
+            etProfileFirstName.setFocusable(false);
+            controller.setEtProfileLastName(etProfileLastName);
 
 
             isCreatedProfile = true;
@@ -188,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void initiateCreateLogin() {
+    public void inititateLoginControls() {
         try {
             btnLogin = findViewById(R.id.btnLogin);
             btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -201,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                     TextView tvLoginInformation = findViewById(R.id.tvLoginInformation);
                     controller.setTvLoginInformation(tvLoginInformation);
 
-                    controller.connect2Peppper(etLoginUserName.getText().toString(),etLoginPassword.getText().toString());
+                    controller.connect2Pepper(etLoginUserName.getText().toString(), etLoginPassword.getText().toString());
                 }
             });
             isCreatedLogin = true;

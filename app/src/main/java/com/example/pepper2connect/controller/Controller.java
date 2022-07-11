@@ -1,9 +1,13 @@
 package com.example.pepper2connect.controller;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+
+import com.example.pepper2connect.Crypto.Decryption;
 import com.example.pepper2connect.Model.User;
 import com.example.pepper2connect.client.Client;
 import com.example.pepper2connect.messages.Message;
@@ -23,6 +27,7 @@ public class Controller {
 
     final private String strServerIP = "127.10.10.15";
     final private int intPort = 10284;
+    Decryption decryption = new Decryption();
 
     private User currentUser;
 
@@ -32,26 +37,31 @@ public class Controller {
 
     TextView tvLoginInformation;
 
+    private AlertDialog.Builder alertDialogBuilder;
+    private AlertDialog alertDialog;
+
+    private String strBufferPatientInfo = "", strBufferLogServerCon= "";
 
     public Controller() {
 
     }
 
-    public void connect2Peppper(String strUsername, String strPassword) {
+    public void connect2Pepper(String strUsername, String strPassword) {
+        if (!isLoggedIn && !isClientConnected) {
+            if (strUsername != null) {
+                if (!strUsername.isEmpty()) {
+                    if (strPassword != null) {
+                        if (!strPassword.isEmpty()) {
+                            this.strUsername = strUsername;
 
-        if (strUsername != null) {
-            if (!strUsername.isEmpty()) {
-                if (strPassword != null) {
-                    if (!strPassword.isEmpty()) {
-                        this.strUsername = strUsername;
+                            try {
+                                client = new Client(this.strServerIP, this.intPort, strUsername, strPassword, this);
+                            } catch (Exception ex) {
+                                String err = "";
+                                err = ex.getMessage();
 
-                        try {
-                            client = new Client(this.strServerIP, this.intPort, strUsername, strPassword, this);
-                        } catch (Exception ex) {
-                            String err = "";
-                            err = ex.getMessage();
-
-                            strUsername = "";
+                                strUsername = "";
+                            }
                         }
                     }
                 }
@@ -69,10 +79,10 @@ public class Controller {
     }
 
     public void disconnectFromPepper(MessageSystem msgSys) {
-        if (client != null && isClientConnected) {
+        if (client != null && isClientConnected && isLoggedIn) {
             showLoginStatusInformation(msgSys);
 
-            appendSystemMessage2EditText(msgSys);
+            appendLogServerCon(msgSys);
             client.disconnect();
         }
     }
@@ -81,24 +91,57 @@ public class Controller {
         if (tvLoginInformation != null) {
             switch (msgSys.getType()) {
                 case LogOut:
+                    alertDialogBuilder.setTitle("Logged Out");
+                    alertDialogBuilder.setMessage("You have successfully logged out. \n Have a nice day!.");
+                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                        }
+                    });
+
                     tvLoginInformation.setText("You have Successfully logged out. \n Have a nice day!");
                     tvLoginInformation.setTextColor(Color.parseColor("#FF000000"));
                     break;
                 case Unsuccessful_LogIn:
+                    alertDialogBuilder.setTitle("Unsuccessful Login");
+                    alertDialogBuilder.setMessage("Username or Password incorrect, please try again.");
+                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                        }
+                    });
                     tvLoginInformation.setText("Username or Password incorrect, please try again.");
                     tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
                     break;
                 case Successful_LogIn:
+                    alertDialogBuilder.setTitle("Successful Login");
+                    alertDialogBuilder.setMessage("You have successfully Logged in!.");
+                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                        }
+                    });
                     tvLoginInformation.setText("You have successfully Logged in!.");
                     tvLoginInformation.setTextColor(Color.parseColor("#00B612"));
                     break;
                 case Error:
+
                     String strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
+                    alertDialogBuilder.setTitle("Error");
+                    alertDialogBuilder.setMessage(strMessage);
+                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                        }
+                    });
                     tvLoginInformation.setText(strMessage);
                     tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
                     break;
 
             }
+            alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+
         }
     }
 
@@ -106,44 +149,102 @@ public class Controller {
      * Fragment_Server
      */
 
+    /** TODO decomment sendSysMessage
+     *
+     */
+    public void clientLogOut() {
+        if (isClientConnected) {
+            MessageSystem msgSysTest = new MessageSystem("");
+            msgSysTest.setType(MessageType.LogOut);
 
+           // client.sendSysMessage(msgSysTest);
+        }
+    }
+
+    /** TODO decomment sendSysMessage
+     *
+     */
     public void testServerConnection() {
         if (isClientConnected) {
             MessageSystem msgSysTest = new MessageSystem("");
             msgSysTest.setType(MessageType.Test);
 
             //client.sendSysMessage(msgSysTest);
-
-            appendSystemMessage2EditText(msgSysTest);
         }
     }
 
-    public void appendSystemMessage2EditText(MessageSystem messageSystem) {
-        if (messageSystem.getType().toString().equals(MessageType.Patient.toString())) {
-            String strAppendString = messageSystem.getStrSystemNotification();
-            appendText2EditText(strAppendString, etPatientInformation);
-        }
+    public void appendLogServerCon(MessageSystem messageSystem) {
+
+        String strAppendString = "";
+        strAppendString += "Last Message Type received: \n" + messageSystem.getType().toString();
 
         if (etLogServerCon != null) {
-            String strAppendString = "";
-            String strLoginStatus = "";
-            if(isClientConnected) {
-                if (!isLoggedIn) {
-                    strLoginStatus = " not";
-                }
-
-                if (messageSystem.getType().toString().equals(MessageType.Successful_LogIn.toString())) {
-
-                    strAppendString = strUsername + "is currently" + strLoginStatus + " connected and logged in. \n";
-                }
-
-                strAppendString += "Last Messagetype received: \n" + messageSystem.getType().toString();
-            }else {
-                strAppendString = "Cannot perform Test if App is not Connected to the Server";
-            }
-
             appendText2EditText(strAppendString, etLogServerCon);
+        } else {
 
+            if (strBufferLogServerCon == null) {
+                strBufferLogServerCon = stringBuffer(strAppendString, strBufferLogServerCon);
+
+            } else {
+
+                strBufferLogServerCon += stringBuffer(strAppendString, strBufferLogServerCon);
+            }
+        }
+    }
+
+    public void checkLogServerConBuffer(){
+        if(strBufferLogServerCon!=null){
+            if(!strBufferLogServerCon.isEmpty()){
+                etLogServerCon.append(strBufferLogServerCon);
+                strBufferLogServerCon="";
+            }
+        }
+    }
+    /**
+     * Fragment_Profile
+     */
+
+    public void fillProfile(){
+        if(currentUser != null && etProfileTitle != null && etProfileFirstName != null && etProfileLastName != null){
+            etProfileTitle.setText(currentUser.getStrTitle());
+            etProfileFirstName.setText(currentUser.getStrFirstname());
+            etProfileLastName.setText(currentUser.getStrLastname());
+        }
+    }
+
+    /**
+     * Patient Information
+     */
+
+
+
+    public void appendPatientInformation(MessageSystem messageSystem) {
+        try {
+            if (etPatientInformation != null) {
+                String strAppendString = decryption.decrypt(messageSystem.getStrSystemNotification());
+
+                appendText2EditText(strAppendString, etPatientInformation);
+            }else {
+                if (strBufferLogServerCon == null) {
+                    strBufferLogServerCon = stringBuffer(decryption.decrypt(messageSystem.getStrSystemNotification()), strBufferPatientInfo);
+                } else {
+
+                    strBufferLogServerCon += stringBuffer(decryption.decrypt(messageSystem.getStrSystemNotification()), strBufferPatientInfo);
+                }
+
+            }
+        } catch (Exception ex) {
+            String err = "";
+            err = ex.getMessage();
+            err += "";
+        }
+    }
+    public void checkPatientInfoBuffer(){
+        if(strBufferPatientInfo!=null){
+            if(!strBufferPatientInfo.isEmpty()){
+                etPatientInformation.append(strBufferPatientInfo);
+                strBufferPatientInfo="";
+            }
         }
     }
 
@@ -165,7 +266,17 @@ public class Controller {
             etAppend.append(strAppendText);
             etAppend.append("\n");
             etAppend.append("-------------");
+            etAppend.append("\n");
         }
+    }
+    private String stringBuffer(String strAppendText, String strBuffer) {
+        if (strBuffer != null) {
+            strBuffer += "\n ------------- \n " + getDateTime() + " \n  " + strAppendText + "\n ------------- \n";
+
+        }else{
+            strBuffer = "\n ------------- \n " + getDateTime() + " \n  " + strAppendText + "\n ------------- \n";
+        }
+        return strBuffer;
     }
 
     public String getDateTime() {
@@ -176,6 +287,11 @@ public class Controller {
         String formattedDate = df.format(currentDateTime);
         return formattedDate;
     }
+
+    /**
+     * Setters for Controls
+     */
+
 
     public void setEtLogServerCon(EditText etLogServerCon) {
         this.etLogServerCon = etLogServerCon;
@@ -196,5 +312,20 @@ public class Controller {
 
     public void setTvLoginInformation(TextView tvLoginInformation) {
         this.tvLoginInformation = tvLoginInformation;
+    }
+
+    public void setEtProfileFirstName(EditText etProfileFirstName) {
+        this.etProfileFirstName = etProfileFirstName;
+
+    }
+
+    public void setEtProfileLastName(EditText etProfileLastName) {
+        this.etProfileLastName = etProfileLastName;
+
+    }
+
+    public void setEtProfileTitle(EditText etProfileTitle) {
+        this.etProfileTitle = etProfileTitle;
+
     }
 }
