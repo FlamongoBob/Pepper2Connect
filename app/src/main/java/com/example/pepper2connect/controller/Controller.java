@@ -21,8 +21,8 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Controller {
-    public static volatile Boolean isClientConnected = true;
-    public static volatile Boolean isLoggedIn = true;
+    public static volatile Boolean isClientConnected = false;
+    public static volatile Boolean isLoggedIn = false;
     private Client client;
 
     final private String strServerIP = "127.10.10.15";
