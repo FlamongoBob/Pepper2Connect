@@ -116,6 +116,7 @@ public class Clientmodel {
                 try {
                     if (socket != null) {
                         socket = new Socket(strIpAddress, intPort);
+                        Login(strUserName, strPassword);
                     }
                     controller.isClientConnected = true;
 

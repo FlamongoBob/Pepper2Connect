@@ -157,7 +157,7 @@ public class Controller {
             MessageSystem msgSysTest = new MessageSystem("");
             msgSysTest.setType(MessageType.LogOut);
 
-           // client.sendSysMessage(msgSysTest);
+            client.sendSysMessage(msgSysTest);
         }
     }
 
@@ -169,7 +169,7 @@ public class Controller {
             MessageSystem msgSysTest = new MessageSystem("");
             msgSysTest.setType(MessageType.Test);
 
-            //client.sendSysMessage(msgSysTest);
+            client.sendSysMessage(msgSysTest);
         }
     }
 
