@@ -301,8 +301,20 @@ public class Controller {
      */
 
     public void fillCurrentUser(MessageUser msgU) {
-        if (msgU != null) {
-            currentUser = new User(msgU.getIntUserID(), msgU.getStrTitle(), msgU.getStrFirstname(), msgU.getStrLastname(), msgU.getStrPicture(), msgU.getIntRoleID());
+        try {
+
+
+            if (msgU != null) {
+                currentUser = new User(Integer.parseInt(decryption.decrypt(msgU.getStrUserID()))
+                        , decryption.decrypt(msgU.getStrTitle())
+                        , decryption.decrypt(msgU.getStrFirstname())
+                        , decryption.decrypt(msgU.getStrLastname())
+                        , decryption.decrypt(msgU.getStrPicture())
+                        , msgU.getIntRoleID());
+            }
+        }catch (Exception ex){
+            String err = ex.getMessage();
+            err +="";
         }
     }
 

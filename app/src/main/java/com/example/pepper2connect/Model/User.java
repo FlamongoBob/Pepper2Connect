@@ -23,13 +23,6 @@ public class User {
     public String toString() {
         return intUserID +'|'+ strTitle+ '|' + strFirstname+ '|' + strLastname+'|'+ strPicture+'|'+ intRoleID;
     }
-    /*
-    public String toStringLoginInfo(){
-        return strUserName + '|' + strPassword;
-    }
-    public String toStringUserinfo(){
-        return strTitle+ '|' + strFirstname+ '|' + strLastname;
-    }*/
 
     public int getIntUserID() {
         return intUserID;
@@ -54,19 +47,4 @@ public class User {
     public int getIntRoleID() {
         return intRoleID;
     }
-/*
-    public void setStrTitle(String strTitle) {
-        this.strTitle = strTitle;
-    }
-
-    public void setStrFirstname(String strFirstname) {
-        this.strFirstname = strFirstname;
-    }
-
-
-    public void setStrLastname(String strLastname) {
-        this.strLastname = strLastname;
-    }
-    */
-
 }
