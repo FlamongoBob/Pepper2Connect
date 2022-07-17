@@ -7,17 +7,21 @@ public class User {
     private String strTitle;
     private String strFirstname;
     private String strLastname;
+    private String strPicture;
+    private int intRoleID;
 
-    public User(int intUserID ,String strTitle, String strFirstname, String strLastname){
+    public User(int intUserID ,String strTitle, String strFirstname, String strLastname, String strPicture, int intRoleID){
         this.intUserID = intUserID;
         this.strTitle = strTitle;
         this.strFirstname = strFirstname;
         this.strLastname = strLastname;
+        this.strPicture = strPicture;
+        this.intRoleID = intRoleID;
     }
 
     @Override
     public String toString() {
-        return intUserID +'|'+ strTitle+ '|' + strFirstname+ '|' + strLastname;
+        return intUserID +'|'+ strTitle+ '|' + strFirstname+ '|' + strLastname+'|'+ strPicture+'|'+ intRoleID;
     }
     /*
     public String toStringLoginInfo(){
@@ -43,7 +47,14 @@ public class User {
         return strLastname;
     }
 
-    /*
+    public String getStrPicture() {
+        return strPicture;
+    }
+
+    public int getIntRoleID() {
+        return intRoleID;
+    }
+/*
     public void setStrTitle(String strTitle) {
         this.strTitle = strTitle;
     }

@@ -11,6 +11,11 @@ public enum MessageType {
     , Successful_LogIn
     , Patient
     , Error
-    , Test;
+    , Test
+    , NewUser
+    , UpdateUser
+    , Unsuc_NewUserAdded
+    , Suc_NewUserAdded;
+
 }
 

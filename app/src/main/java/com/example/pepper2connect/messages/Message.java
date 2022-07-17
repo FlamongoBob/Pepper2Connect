@@ -100,6 +100,12 @@ public abstract class Message {
                 } else if (parts[0].equals(MessageType.User.toString())) {
                     message = new MessageUser(Integer.parseInt(parts[1]),parts[2],parts[3],parts[4]);
                     message.setType(MessageType.User);
+                } else if (parts[0].equals(MessageType.Suc_NewUserAdded.toString())) {
+                    message = new MessageSystem(parts[1]);
+                    message.setType(MessageType.Suc_NewUserAdded);
+                } else if (parts[0].equals(MessageType.Unsuc_NewUserAdded.toString())) {
+                    message = new MessageSystem(parts[1]);
+                    message.setType(MessageType.Unsuc_NewUserAdded);
                 }
             }
         } catch (IOException e) {

@@ -3,14 +3,18 @@ package com.example.pepper2connect.controller;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
 import com.example.pepper2connect.Crypto.Decryption;
 import com.example.pepper2connect.Model.User;
 import com.example.pepper2connect.client.Client;
 import com.example.pepper2connect.messages.Message;
+import com.example.pepper2connect.messages.MessageInsert;
 import com.example.pepper2connect.messages.MessageSystem;
 import com.example.pepper2connect.messages.MessageType;
 import com.example.pepper2connect.messages.MessageUser;
@@ -21,8 +25,10 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Controller {
-    public static volatile Boolean isClientConnected = false;
-    public static volatile Boolean isLoggedIn = false;
+    // public static volatile Boolean isClientConnected = false;
+    // public static volatile Boolean isLoggedIn = false;
+    public static volatile Boolean isClientConnected = true;
+    public static volatile Boolean isLoggedIn = true;
     private Client client;
 
     final private String strServerIP = "127.10.10.15";
@@ -37,10 +43,18 @@ public class Controller {
 
     TextView tvLoginInformation;
 
+
+    //New User Controlls
+    EditText etNuFirstName, etNuTitle, etNuLastName, etNuPassword, etNuUserName;
+    String strPicture;
+    Spinner spTitle, spRole;
+    int intNuRoleID, intNuTitleID;
+    //----
+
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
 
-    private String strBufferPatientInfo = "", strBufferLogServerCon= "";
+    private String strBufferPatientInfo = "", strBufferLogServerCon = "";
 
     public Controller() {
 
@@ -55,6 +69,7 @@ public class Controller {
                             this.strUsername = strUsername;
 
                             try {
+                                currentUser = null;
                                 client = new Client(this.strServerIP, this.intPort, strUsername, strPassword, this);
                             } catch (Exception ex) {
                                 String err = "";
@@ -74,20 +89,21 @@ public class Controller {
      */
 
     public void clientSuccessfulLogin(MessageSystem msgSys) {
-        showLoginStatusInformation(msgSys);
+        showInformation(msgSys);
         isLoggedIn = true;
     }
 
     public void disconnectFromPepper(MessageSystem msgSys) {
         if (client != null && isClientConnected && isLoggedIn) {
-            showLoginStatusInformation(msgSys);
+            showInformation(msgSys);
 
             appendLogServerCon(msgSys);
             client.disconnect();
         }
     }
 
-    public void showLoginStatusInformation(Message msgSys) {
+    public void showInformation(Message msgSys) {
+        String strMessage;
         if (tvLoginInformation != null) {
             switch (msgSys.getType()) {
                 case LogOut:
@@ -126,7 +142,7 @@ public class Controller {
                     break;
                 case Error:
 
-                    String strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
+                    strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
                     alertDialogBuilder.setTitle("Error");
                     alertDialogBuilder.setMessage(strMessage);
                     alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -136,6 +152,17 @@ public class Controller {
                     });
                     tvLoginInformation.setText(strMessage);
                     tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
+                    break;
+                case Unsuc_NewUserAdded:
+                    strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
+                    alertDialogBuilder.setTitle("User was not created");
+                    alertDialogBuilder.setMessage(strMessage);
+                    break;
+                case Suc_NewUserAdded:
+
+                    strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
+                    alertDialogBuilder.setTitle("Successfully created new User");
+                    alertDialogBuilder.setMessage(strMessage);
                     break;
 
             }
@@ -149,8 +176,8 @@ public class Controller {
      * Fragment_Server
      */
 
-    /** TODO decomment sendSysMessage
-     *
+    /**
+     * TODO decomment sendSysMessage
      */
     public void clientLogOut() {
         if (isClientConnected) {
@@ -161,8 +188,8 @@ public class Controller {
         }
     }
 
-    /** TODO decomment sendSysMessage
-     *
+    /**
+     * TODO decomment sendSysMessage
      */
     public void testServerConnection() {
         if (isClientConnected) {
@@ -192,23 +219,26 @@ public class Controller {
         }
     }
 
-    public void checkLogServerConBuffer(){
-        if(strBufferLogServerCon!=null){
-            if(!strBufferLogServerCon.isEmpty()){
+    public void checkLogServerConBuffer() {
+        if (strBufferLogServerCon != null) {
+            if (!strBufferLogServerCon.isEmpty()) {
                 etLogServerCon.append(strBufferLogServerCon);
-                strBufferLogServerCon="";
+                strBufferLogServerCon = "";
             }
         }
     }
+
     /**
      * Fragment_Profile
      */
 
-    public void fillProfile(){
-        if(currentUser != null && etProfileTitle != null && etProfileFirstName != null && etProfileLastName != null){
+    public void fillProfile(Fragment fragment_profile) {
+        if (currentUser != null && etProfileTitle != null && etProfileFirstName != null && etProfileLastName != null) {
             etProfileTitle.setText(currentUser.getStrTitle());
             etProfileFirstName.setText(currentUser.getStrFirstname());
             etProfileLastName.setText(currentUser.getStrLastname());
+
+
         }
     }
 
@@ -217,14 +247,13 @@ public class Controller {
      */
 
 
-
     public void appendPatientInformation(MessageSystem messageSystem) {
         try {
             if (etPatientInformation != null) {
                 String strAppendString = decryption.decrypt(messageSystem.getStrSystemNotification());
 
                 appendText2EditText(strAppendString, etPatientInformation);
-            }else {
+            } else {
                 if (strBufferLogServerCon == null) {
                     strBufferLogServerCon = stringBuffer(decryption.decrypt(messageSystem.getStrSystemNotification()), strBufferPatientInfo);
                 } else {
@@ -239,21 +268,42 @@ public class Controller {
             err += "";
         }
     }
-    public void checkPatientInfoBuffer(){
-        if(strBufferPatientInfo!=null){
-            if(!strBufferPatientInfo.isEmpty()){
+
+    public void checkPatientInfoBuffer() {
+        if (strBufferPatientInfo != null) {
+            if (!strBufferPatientInfo.isEmpty()) {
                 etPatientInformation.append(strBufferPatientInfo);
-                strBufferPatientInfo="";
+                strBufferPatientInfo = "";
             }
         }
     }
+
+    /**
+     * NewUser
+     */
+
+    public void addNewUser() {
+        MessageInsert msgNu = new MessageInsert(MessageType.NewUser
+                , etNuTitle.getText().toString()
+                , etNuFirstName.getText().toString()
+                , etNuLastName.getText().toString()
+                , strPicture
+                , (int) spRole.getSelectedItemId()
+                , etNuUserName.getText().toString()
+                , etNuPassword.getText().toString());
+        client.sendInsertMessage(msgNu);
+    }
+
+
 
     /**
      * General
      */
 
     public void fillCurrentUser(MessageUser msgU) {
-        currentUser = new User(msgU.getIntUserID(), msgU.getStrTitle(), msgU.getStrFirstname(), msgU.getStrLastname());
+        if (msgU != null) {
+            currentUser = new User(msgU.getIntUserID(), msgU.getStrTitle(), msgU.getStrFirstname(), msgU.getStrLastname(), msgU.getStrPicture(), msgU.getIntRoleID());
+        }
     }
 
     private void appendText2EditText(String strAppendText, EditText etAppend) {
@@ -269,11 +319,12 @@ public class Controller {
             etAppend.append("\n");
         }
     }
+
     private String stringBuffer(String strAppendText, String strBuffer) {
         if (strBuffer != null) {
             strBuffer += "\n ------------- \n " + getDateTime() + " \n  " + strAppendText + "\n ------------- \n";
 
-        }else{
+        } else {
             strBuffer = "\n ------------- \n " + getDateTime() + " \n  " + strAppendText + "\n ------------- \n";
         }
         return strBuffer;
@@ -327,5 +378,45 @@ public class Controller {
     public void setEtProfileTitle(EditText etProfileTitle) {
         this.etProfileTitle = etProfileTitle;
 
+    }
+
+    public void setEtNuFirstName(EditText etNuFirstName) {
+        this.etNuFirstName = etNuFirstName;
+    }
+
+    public void setEtNuTitle(EditText etNuTitle) {
+        this.etNuTitle = etNuTitle;
+    }
+
+    public void setEtNuLastName(EditText etNuLastName) {
+        this.etNuLastName = etNuLastName;
+    }
+
+    public void setEtNuPassword(EditText etNuPassword) {
+        this.etNuPassword = etNuPassword;
+    }
+
+    public void setEtNuUserName(EditText etNuUserName) {
+        this.etNuUserName = etNuUserName;
+    }
+
+    public void setStrPicture(String strPicture) {
+        this.strPicture = strPicture;
+    }
+
+    public void setIntNuRoleID(int intNuRoleID) {
+        this.intNuRoleID = intNuRoleID;
+    }
+
+    public void setIntNuTitleID(int intNuTitleID) {
+        this.intNuTitleID = intNuTitleID;
+    }
+
+    public void setSpTitle(Spinner spTitle) {
+        this.spTitle = spTitle;
+    }
+
+    public void setSpRole(Spinner spRole) {
+        this.spRole = spRole;
     }
 }

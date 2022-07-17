@@ -5,6 +5,8 @@ public class MessageUser extends Message{
     private String strFirstname;
     private String strLastname;
     private int intUserID;
+    private String strPicture;
+    private int intRoleID;
 
     public MessageUser(int intUserID,String strTitle, String strFirstname, String strLastname) {
         super(MessageType.User);
@@ -12,6 +14,8 @@ public class MessageUser extends Message{
         this.strTitle = strTitle;
         this.strFirstname = strFirstname;
         this.strLastname = strLastname;
+        this.strPicture = strPicture;
+        this.intRoleID = intRoleID;
     }
 
     @Override
@@ -35,7 +39,13 @@ public class MessageUser extends Message{
         return strLastname;
     }
 
+    public String getStrPicture() {
+        return strPicture;
+    }
 
+    public int getIntRoleID() {
+        return intRoleID;
+    }
 
 
 }

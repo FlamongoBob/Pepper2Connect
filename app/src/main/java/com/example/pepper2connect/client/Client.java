@@ -40,13 +40,23 @@ public class Client {
 
 
     /**
-     * Sending Chatmessages
+     * Sending System Messages
      * @param messageSystem
      *
      */
     public void sendSysMessage(MessageSystem messageSystem) {
 
         cModel.sendMessage(messageSystem);
+    }
+
+    /**
+     * Sending Insert Messages
+     * @param messageInsert
+     *
+     */
+    public void sendInsertMessage(MessageInsert messageInsert) {
+
+        cModel.sendMessage(messageInsert);
     }
     /*
 

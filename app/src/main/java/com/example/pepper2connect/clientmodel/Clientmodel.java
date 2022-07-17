@@ -80,10 +80,14 @@ public class Clientmodel {
                                 controller.fillCurrentUser((MessageUser) msg);
 
                             }else if (msg.getType().equals(MessageType.Error)) {
-                                controller.showLoginStatusInformation(msg);
+                                controller.showInformation(msg);
 
                             }else if (msg.getType().equals(MessageType.Test)) {
                                 controller.appendLogServerCon((MessageSystem) msg);
+                            }else if (msg.getType().equals(MessageType.Suc_NewUserAdded)) {
+                                controller.showInformation((MessageSystem) msg);
+                            }else if (msg.getType().equals(MessageType.Unsuc_NewUserAdded)) {
+                                controller.showInformation((MessageSystem) msg);
                             }
                         }
 

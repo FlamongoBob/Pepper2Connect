@@ -23,18 +23,19 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
-    private Controller controller;
+    private Controller controller = new Controller();
+
     private boolean isCreatedPatient = false;
     private boolean isCreatedLogin = false;
     private boolean isCreatedProfile = false;
     private boolean isCreatedServer = false;
 
-    Fragment frgLogin = new Fragment_Login();
-    Fragment frgProfile = new Fragment_Profile();
-    Fragment frgPatient = new Fragment_PatientInformation();
-    Fragment frgServer = new Fragment_ServerConnection();
-    FragmentManager frgMng = getSupportFragmentManager();
-    Fragment active = frgLogin;
+    Fragment_Login frgLogin = new Fragment_Login();
+    Fragment_Profile frgProfile = new Fragment_Profile(this, controller);
+    Fragment_PatientInformation frgPatient = new Fragment_PatientInformation();
+    Fragment_ServerConnection frgServer = new Fragment_ServerConnection();
+    public FragmentManager frgMng = getSupportFragmentManager();
+    Fragment activeFragment = frgLogin;
 
     Button btnTestConnection, btnLogin;
 
@@ -63,21 +64,21 @@ public class MainActivity extends AppCompatActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.navigation_Login:
-                            if (!active.getTag().equals(frgMng.findFragmentByTag("frgLogin").getTag())) {
-                                frgMng.beginTransaction().hide(active).show(frgLogin).commit();
-                                active = frgLogin;
+                            if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgLogin").getTag())) {
+                                frgMng.beginTransaction().hide(activeFragment).show(frgLogin).commit();
+                                activeFragment = frgLogin;
                                 if (!isCreatedLogin) {
-                                    inititateLoginControls();
+                                    initiateLoginControls();
                                 }
                                 return true;
                             }
                             break;
 
                         case R.id.navigation_PatientInformation:
-                            if (!active.getTag().equals(frgMng.findFragmentByTag("frgPatient").getTag())) {
+                            if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgPatient").getTag())) {
                                 if (controller.isLoggedIn) {
-                                    frgMng.beginTransaction().hide(active).show(frgPatient).commit();
-                                    active = frgPatient;
+                                    frgMng.beginTransaction().hide(activeFragment).show(frgPatient).commit();
+                                    activeFragment = frgPatient;
 
                                     if (!isCreatedPatient) {
                                         initiatePatientControls();
@@ -102,15 +103,16 @@ public class MainActivity extends AppCompatActivity {
                                 return false;
                             }
                         case R.id.navigation_Profile:
-                            if (!active.getTag().equals(frgMng.findFragmentByTag("frgProfile").getTag())) {
+                            if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgProfile").getTag())) {
                                 if (controller.isLoggedIn) {
-                                    frgMng.beginTransaction().hide(active).show(frgProfile).commit();
-                                    active = frgProfile;
+                                    frgMng.beginTransaction().hide(activeFragment).show(frgProfile).commit();
+                                    activeFragment = frgProfile;
 
                                     if (!isCreatedProfile) {
                                         initiateProfileControls();
                                     }
-                                    controller.fillProfile();
+
+                                    controller.fillProfile(frgProfile);
                                     return true;
                                 } else {
                                     alertDialogBuilder.setTitle("Not Logged In");
@@ -129,10 +131,10 @@ public class MainActivity extends AppCompatActivity {
                                 return false;
                             }
                         case R.id.navigation_ServerConnection:
-                            if (!active.getTag().equals(frgMng.findFragmentByTag("frgServer").getTag())) {
+                            if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgServer").getTag())) {
 
-                                frgMng.beginTransaction().hide(active).show(frgServer).commit();
-                                active = frgServer;
+                                frgMng.beginTransaction().hide(activeFragment).show(frgServer).commit();
+                                activeFragment = frgServer;
 
                                 if (!isCreatedServer) {
                                     initiateServerControls();
@@ -176,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
             err += "\n MEGA NOICE";
         }
     }
+
 
     public void initiateServerControls() {
         try {
@@ -235,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void inititateLoginControls() {
+    public void initiateLoginControls() {
         try {
             btnLogin = findViewById(R.id.btnLogin);
             btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -257,6 +260,18 @@ public class MainActivity extends AppCompatActivity {
             err = ex.getMessage();
             isCreatedLogin = false;
         }
+    }
+
+    public FragmentManager getFrgMng() {
+        return frgMng;
+    }
+
+    public Fragment getActiveFragment() {
+        return activeFragment;
+    }
+
+    public void setActiveFragment(Fragment activeFragment) {
+        this.activeFragment = activeFragment;
     }
 
     public Controller getController() {
