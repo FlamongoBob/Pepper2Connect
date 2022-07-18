@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -94,6 +95,9 @@ public class Fragment_Profile extends Fragment {
     }
 
     private void initiateNewUserControls(){
+        ImageButton ibNewPicture = mainActivity.findViewById(R.id.ibNewPicture);
+        controller.setIBNewPicture(ibNewPicture);
+
         EditText etNuFirstName = mainActivity.findViewById(R.id.etNuFirstName);
         controller.setEtNuFirstName(etNuFirstName);
 

@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -28,8 +29,8 @@ import java.util.Locale;
 public class Controller {
     // public static volatile Boolean isClientConnected = false;
     // public static volatile Boolean isLoggedIn = false;
-    /**TODO COMMENT isClientConnected, isLoggedIn
-     *
+    /**
+     * TODO COMMENT isClientConnected, isLoggedIn
      */
     public static volatile Boolean isClientConnected = true;
     public static volatile Boolean isLoggedIn = true;
@@ -51,9 +52,10 @@ public class Controller {
 
     //New User Controlls
     EditText etNuFirstName, etNuTitle, etNuLastName, etNuPassword, etNuUserName;
-    String strPicture;
+    String strNewUserPicture;
     Spinner spTitle, spRole;
     int intNuRoleID, intNuTitleID;
+    ImageButton ibNewPicture;
     //----
 
     private AlertDialog.Builder alertDialogBuilder;
@@ -166,8 +168,17 @@ public class Controller {
                 case Suc_NewUserAdded:
 
                     strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
-                    alertDialogBuilder.setTitle("Successfully created new User");
-                    alertDialogBuilder.setMessage(strMessage);
+                    alertDialogBuilder.setTitle(resources.getText(R.string.Suc_NewUserAdded_Title));
+                    alertDialogBuilder.setMessage(resources.getText(R.string.Suc_NewUserAdded_Text) + strMessage);
+
+                    etNuTitle.setText("");
+                    etNuFirstName.setText("");
+                    etNuLastName.setText("");
+                    strNewUserPicture = "";
+                    spRole.setSelection(0);
+                    etNuUserName.setText("");
+                    etNuPassword.setText("");
+
                     break;
 
             }
@@ -284,7 +295,7 @@ public class Controller {
     }
 
     /**
-     * NewUser
+     * Fraggment NewUser
      */
 
     public void addNewUser() {
@@ -292,13 +303,17 @@ public class Controller {
                 , etNuTitle.getText().toString()
                 , etNuFirstName.getText().toString()
                 , etNuLastName.getText().toString()
-                , strPicture
+                , strNewUserPicture
                 , (int) spRole.getSelectedItemId()
                 , etNuUserName.getText().toString()
                 , etNuPassword.getText().toString());
         client.sendInsertMessage(msgNu);
     }
 
+    public void newPicture() {
+
+
+    }
 
 
     /**
@@ -317,9 +332,9 @@ public class Controller {
                         , decryption.decrypt(msgU.getStrPicture())
                         , msgU.getIntRoleID());
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             String err = ex.getMessage();
-            err +="";
+            err += "";
         }
     }
 
@@ -408,6 +423,10 @@ public class Controller {
         this.etNuFirstName = etNuFirstName;
     }
 
+    public void setIBNewPicture(ImageButton ibNewPicture) {
+        this.ibNewPicture = ibNewPicture;
+    }
+
     public void setEtNuTitle(EditText etNuTitle) {
         this.etNuTitle = etNuTitle;
     }
@@ -424,8 +443,8 @@ public class Controller {
         this.etNuUserName = etNuUserName;
     }
 
-    public void setStrPicture(String strPicture) {
-        this.strPicture = strPicture;
+    public void setStrNewUserPicture(String strNewUserPicture) {
+        this.strNewUserPicture = strNewUserPicture;
     }
 
     public void setIntNuRoleID(int intNuRoleID) {

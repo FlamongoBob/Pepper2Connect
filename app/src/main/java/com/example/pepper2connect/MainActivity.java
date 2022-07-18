@@ -1,18 +1,30 @@
 package com.example.pepper2connect;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +32,8 @@ import android.widget.Toast;
 import com.example.pepper2connect.controller.Controller;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
@@ -144,9 +158,9 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
                                 ImageView iv = findViewById(R.id.iv_Robot);
-                                if(controller.isClientConnected) {
+                                if (controller.isClientConnected) {
                                     iv.setColorFilter(getColor(R.color.connected_Green));
-                                }else {
+                                } else {
 
                                     iv.setColorFilter(getColor(R.color.disconnected_red));
                                 }
@@ -157,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                                 return false;
                             }
                         case R.id.navigation_Logout:
-                            if(controller.isLoggedIn) {
+                            if (controller.isLoggedIn) {
                                 alertDialogBuilder.setTitle(resources.getText(R.string.Log_Out_Title));
                                 alertDialogBuilder.setMessage(resources.getText(R.string.Log_Out_Text));
                                 alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_YES), new DialogInterface.OnClickListener() {
@@ -290,4 +304,91 @@ public class MainActivity extends AppCompatActivity {
     public Controller getController() {
         return controller;
     }
+
+    public void checkPermission(String permission, int requestCode)
+    {
+        // Checking if permission is not granted
+        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] { permission }, requestCode);
+        }
+        else {
+            Toast.makeText(MainActivity.this, "Permission already granted", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void imageCapturer() {
+        Intent image = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+
+        //requestPermissionLauncher.launch("Camera Permission");
+        //activityGetImage.launch(image);
+        checkPermission();
+    }
+
+    public void imageChooser() {
+        Intent i = new Intent();
+        i.setType("image/*");
+        i.setAction(Intent.ACTION_GET_CONTENT);
+
+        activityGetImage.launch(i);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+
+            // Checking whether user granted the permission or not.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                // Showing the toast message
+                Toast.makeText(MainActivity.this, "Camera Permission Granted", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(MainActivity.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Storage Permission Granted", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(MainActivity.this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    ActivityResultLauncher<Intent> activityGetImage = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        ImageButton ibNewPicture = findViewById(R.id.ibNewPicture);
+        if (result.getResultCode()
+                == Activity.RESULT_OK) {
+            Intent data = result.getData();
+            if (data != null
+                    && data.getData() != null) {
+                Uri selectedImageUri = data.getData();
+
+
+                controller.setStrNewUserPicture(selectedImageUri.toString());
+
+                Bitmap selectedImageBitmap;
+                try {
+                    selectedImageBitmap
+                            = MediaStore.Images.Media.getBitmap(
+                            this.getContentResolver(),
+                            selectedImageUri);
+                    ibNewPicture.setImageBitmap(selectedImageBitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
+    class RequestCode {
+        static final int INTERNAL_STORAGE = 100;
+        static final int EXTERNAL_STORAGE = 101;
+        static final int CAMERA_PERMISSION_CODE = 102;
+    }
+
 }
