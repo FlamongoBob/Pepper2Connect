@@ -7,11 +7,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isCreatedProfile = false;
     private boolean isCreatedServer = false;
 
+    Resources resources = Resources.getSystem();
     Fragment_Login frgLogin = new Fragment_Login();
     Fragment_Profile frgProfile = new Fragment_Profile(this, controller);
     Fragment_PatientInformation frgPatient = new Fragment_PatientInformation();
@@ -87,12 +90,12 @@ public class MainActivity extends AppCompatActivity {
 
                                     return true;
                                 } else {
-                                    alertDialogBuilder.setTitle("Not Logged In");
-                                    alertDialogBuilder.setMessage("Please login before moving on to other pages.");
-                                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    alertDialogBuilder.setTitle(resources.getText(R.string.Not_Logged_In_Title));
+                                    alertDialogBuilder.setMessage(resources.getText(R.string.Not_Logged_In_Text));
+                                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface arg0, int arg1) {
-                                            Toast.makeText(MainActivity.this, "Page has not been changed", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MainActivity.this, resources.getText(R.string.Page_not_Changed), Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                     alertDialog = alertDialogBuilder.create();
@@ -115,12 +118,12 @@ public class MainActivity extends AppCompatActivity {
                                     controller.fillProfile(frgProfile);
                                     return true;
                                 } else {
-                                    alertDialogBuilder.setTitle("Not Logged In");
-                                    alertDialogBuilder.setMessage("Please login before moving on to other pages.");
-                                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    alertDialogBuilder.setTitle(resources.getText(R.string.Not_Logged_In_Title));
+                                    alertDialogBuilder.setMessage(resources.getText(R.string.Not_Logged_In_Text));
+                                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface arg0, int arg1) {
-                                            Toast.makeText(MainActivity.this, "Page has not been changed", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MainActivity.this, resources.getText(R.string.Page_not_Changed), Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                     alertDialog = alertDialogBuilder.create();
@@ -139,6 +142,14 @@ public class MainActivity extends AppCompatActivity {
                                 if (!isCreatedServer) {
                                     initiateServerControls();
                                 }
+
+                                ImageView iv = findViewById(R.id.iv_Robot);
+                                if(controller.isClientConnected) {
+                                    iv.setColorFilter(getColor(R.color.connected_Green));
+                                }else {
+
+                                    iv.setColorFilter(getColor(R.color.disconnected_red));
+                                }
                                 controller.checkLogServerConBuffer();
                                 return true;
 
@@ -147,19 +158,19 @@ public class MainActivity extends AppCompatActivity {
                             }
                         case R.id.navigation_Logout:
                             if(controller.isLoggedIn) {
-                                alertDialogBuilder.setTitle("Logout");
-                                alertDialogBuilder.setMessage("Are you sure, You wanted to Log out ?");
-                                alertDialogBuilder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                alertDialogBuilder.setTitle(resources.getText(R.string.Log_Out_Title));
+                                alertDialogBuilder.setMessage(resources.getText(R.string.Log_Out_Text));
+                                alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_YES), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface arg0, int arg1) {
-                                        Toast.makeText(MainActivity.this, "You will be Logged out now.", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(MainActivity.this, resources.getText(R.string.Yes_Log_Out_Text), Toast.LENGTH_LONG).show();
                                         controller.clientLogOut();
                                     }
                                 });
-                                alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                alertDialogBuilder.setNegativeButton(resources.getText(R.string.alertD_NO), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Toast.makeText(MainActivity.this, "You will stay logged in.", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(MainActivity.this, resources.getText(R.string.No_Log_Out_Text), Toast.LENGTH_LONG).show();
                                     }
                                 });
 
@@ -175,13 +186,15 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception ex) {
             String err = "";
             err = ex.getMessage();
-            err += "\n MEGA NOICE";
+            err += "\n ";
         }
     }
 
 
     public void initiateServerControls() {
         try {
+
+
             btnTestConnection = findViewById(R.id.btnTestConnection);
             btnTestConnection.setOnClickListener(view -> controller.testServerConnection());
 

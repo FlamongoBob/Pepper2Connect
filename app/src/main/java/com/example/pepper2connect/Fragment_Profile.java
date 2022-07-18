@@ -1,5 +1,6 @@
 package com.example.pepper2connect;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,7 @@ public class Fragment_Profile extends Fragment {
     MainActivity  mainActivity;
     Controller controller;
 
+    Resources resources = Resources.getSystem();
     FragmentManager frgMng;
     Fragment activeFragment;
     Fragment_NewUser fragment_newUser = new Fragment_NewUser();
@@ -64,7 +66,7 @@ public class Fragment_Profile extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Toast.makeText(mainActivity, "Selected Item: ", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mainActivity, resources.getText(R.string.last_message_rec_Text), Toast.LENGTH_SHORT).show();
         if(activeFragment == null) {
             activeFragment = mainActivity.getActiveFragment();
         }

@@ -1,17 +1,18 @@
 package com.example.pepper2connect.controller;
 
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.pepper2connect.Crypto.Decryption;
 import com.example.pepper2connect.Model.User;
+import com.example.pepper2connect.R;
 import com.example.pepper2connect.client.Client;
 import com.example.pepper2connect.messages.Message;
 import com.example.pepper2connect.messages.MessageInsert;
@@ -27,9 +28,13 @@ import java.util.Locale;
 public class Controller {
     // public static volatile Boolean isClientConnected = false;
     // public static volatile Boolean isLoggedIn = false;
+    /**TODO COMMENT isClientConnected, isLoggedIn
+     *
+     */
     public static volatile Boolean isClientConnected = true;
     public static volatile Boolean isLoggedIn = true;
     private Client client;
+    Resources resources = Resources.getSystem();
 
     final private String strServerIP = "127.10.10.15";
     final private int intPort = 10284;
@@ -107,32 +112,32 @@ public class Controller {
         if (tvLoginInformation != null) {
             switch (msgSys.getType()) {
                 case LogOut:
-                    alertDialogBuilder.setTitle("Logged Out");
-                    alertDialogBuilder.setMessage("You have successfully logged out. \n Have a nice day!.");
-                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    alertDialogBuilder.setTitle(resources.getText(R.string.Logged_Out_Title));
+                    alertDialogBuilder.setMessage(resources.getText(R.string.Logged_Out_Text));
+                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface arg0, int arg1) {
                         }
                     });
 
-                    tvLoginInformation.setText("You have Successfully logged out. \n Have a nice day!");
+                    tvLoginInformation.setText(resources.getText(R.string.Logged_Out_Text));
                     tvLoginInformation.setTextColor(Color.parseColor("#FF000000"));
                     break;
                 case Unsuccessful_LogIn:
-                    alertDialogBuilder.setTitle("Unsuccessful Login");
-                    alertDialogBuilder.setMessage("Username or Password incorrect, please try again.");
-                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    alertDialogBuilder.setTitle(resources.getText(R.string.UnSuc_Login_Title));
+                    alertDialogBuilder.setMessage(resources.getText(R.string.UnSuc_Login_Text));
+                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface arg0, int arg1) {
                         }
                     });
-                    tvLoginInformation.setText("Username or Password incorrect, please try again.");
+                    tvLoginInformation.setText(resources.getText(R.string.UnSuc_Login_Text));
                     tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
                     break;
                 case Successful_LogIn:
-                    alertDialogBuilder.setTitle("Successful Login");
-                    alertDialogBuilder.setMessage("You have successfully Logged in!.");
-                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    alertDialogBuilder.setTitle(resources.getText(R.string.Suc_Login_Title));
+                    alertDialogBuilder.setMessage(resources.getText(R.string.Suc_Login_Text));
+                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface arg0, int arg1) {
                         }
@@ -143,20 +148,20 @@ public class Controller {
                 case Error:
 
                     strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
-                    alertDialogBuilder.setTitle("Error");
-                    alertDialogBuilder.setMessage(strMessage);
-                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    alertDialogBuilder.setTitle(resources.getText(R.string.Error_Title));
+                    alertDialogBuilder.setMessage(resources.getText(R.string.Error_Text) + strMessage);
+                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface arg0, int arg1) {
                         }
                     });
-                    tvLoginInformation.setText(strMessage);
+                    tvLoginInformation.setText(resources.getText(R.string.Error_Text) + strMessage);
                     tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
                     break;
                 case Unsuc_NewUserAdded:
                     strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
-                    alertDialogBuilder.setTitle("User was not created");
-                    alertDialogBuilder.setMessage(strMessage);
+                    alertDialogBuilder.setTitle(resources.getText(R.string.Unsuc_NewUserAdded_Title));
+                    alertDialogBuilder.setMessage(resources.getText(R.string.Unsuc_NewUserAdded_Text) + strMessage);
                     break;
                 case Suc_NewUserAdded:
 
@@ -334,10 +339,17 @@ public class Controller {
 
     private String stringBuffer(String strAppendText, String strBuffer) {
         if (strBuffer != null) {
-            strBuffer += "\n ------------- \n " + getDateTime() + " \n  " + strAppendText + "\n ------------- \n";
+            strBuffer += "\n ------------- \n "
+                    + getDateTime()
+                    + " \n  "
+                    + strAppendText
+                    + "\n ------------- \n";
 
         } else {
-            strBuffer = "\n ------------- \n " + getDateTime() + " \n  " + strAppendText + "\n ------------- \n";
+            strBuffer = "\n ------------- \n "
+                    + getDateTime() + " \n  "
+                    + strAppendText
+                    + "\n ------------- \n";
         }
         return strBuffer;
     }

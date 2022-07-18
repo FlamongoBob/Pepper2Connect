@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pepper2Connect</string>
+
+    <string name="alertD_OK">OK</string>
+    <string name="alertD_YES">Yes</string>
+    <string name="alertD_NO">No</string>
+
+    <string name="Logged_Out_Title">Logged Out!</string>
+    <string name="Logged_Out_Text">You have successfully logged out! \n Have a nice day!</string>
+
+    <string name="UnSuc_Login_Title">Unsuccessful Login!</string>
+    <string name="UnSuc_Login_Text">Username or Password incorrect, please try again.</string>
+
+    <string name="Suc_Login_Title">Successful Login!</string>
+    <string name="Suc_Login_Text">You have successfully Logged in!</string>
+
+    <string name="Error_Title">Error!</string>
+    <string name="Error_Text">An error has occurred! \n Error Message: </string>
+
+    <string name="Unsuc_NewUserAdded_Title">User was not created!</string>
+    <string name="Unsuc_NewUserAdded_Text">An error has occurred while creating new User.
+        \n User was not Created!
+        \n Error Message: </string>
+
+    <string name="Suc_NewUserAdded_Title">Successfully created new User!</string>
+    <string name="Suc_NewUserAdded_Text">Creation of new user was successful</string>
+
+    <string name="last_message_rec_Text">Last Message Type received: \n</string>
+    <string name="sel_Item_Text">Selected Item: </string>
+
+    <string name="Log_Out_Title">Logout</string>
+    <string name="Log_Out_Text">Are you sure you want to log out ?</string>
+    <string name="Yes_Log_Out_Text">You will be Logged out now.</string>
+    <string name="No_Log_Out_Text">You will stay logged in.</string>
+
+
+    <string name="Not_Logged_In_Title">Not Logged In</string>
+    <string name="Not_Logged_In_Text">Please login before moving on to other pages.</string>
+    <string name="Page_not_Changed">Page has not been changed.</string>
+
+    <string name="UserName">Username.</string>
+    <string name="Password">Password</string>
+    <string name="Login">Login</string>
+    <string name="PatientInformation">Patient Information</string>
+    <string name="Profile">Profile</string>
+    <string name="Server">Server</string>
+    <string name="FirstName">Firstname</string>
+    <string name="LastName">LastName</string>
+    <string name="addNewUser">Add New User</string>
+    <string name="Test_Connection">Test Connection</string>
+    <string name="Status">Status</string>
+    <string name="Disconnected">Disconnected</string>
+    <string name="Messages_Log">Messages Log</string>
+    <string name="Title">Title</string>
+
+
+
+</resources>
