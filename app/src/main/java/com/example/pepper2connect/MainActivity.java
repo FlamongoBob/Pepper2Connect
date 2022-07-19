@@ -1,5 +1,7 @@
 package com.example.pepper2connect;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -12,20 +14,27 @@ import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +43,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
@@ -51,11 +62,16 @@ public class MainActivity extends AppCompatActivity {
     Fragment_Profile frgProfile = new Fragment_Profile(this, controller);
     Fragment_PatientInformation frgPatient = new Fragment_PatientInformation();
     Fragment_ServerConnection frgServer = new Fragment_ServerConnection();
+
+    Fragment_NewUser fragment_newUser = new Fragment_NewUser();
+
     public FragmentManager frgMng = getSupportFragmentManager();
     Fragment activeFragment = frgLogin;
 
     Button btnTestConnection, btnLogin;
 
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
+    private int intRequestCode = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,11 +90,15 @@ public class MainActivity extends AppCompatActivity {
             frgMng.beginTransaction().add(R.id.container, frgServer, "frgServer").hide(frgServer).commit();
             frgMng.beginTransaction().add(R.id.container, frgPatient, "frgPatient").hide(frgPatient).commit();
             frgMng.beginTransaction().add(R.id.container, frgProfile, "frgProfile").hide(frgProfile).commit();
+            frgMng.beginTransaction().add(R.id.container, fragment_newUser, "frgNewUser").hide(fragment_newUser).commit();
             frgMng.beginTransaction().add(R.id.container, frgLogin, "frgLogin").commit();
 
             bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    if (activeFragment.getTag().equals(frgMng.findFragmentByTag("frgNewUser").getTag())) {
+                        frgMng.beginTransaction().hide(activeFragment).commit();
+                    }
                     switch (item.getItemId()) {
                         case R.id.navigation_Login:
                             if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgLogin").getTag())) {
@@ -130,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
                                     }
 
                                     controller.fillProfile(frgProfile);
+                                    frgProfile.setFragment_newUser(fragment_newUser);
+
                                     return true;
                                 } else {
                                     alertDialogBuilder.setTitle(resources.getText(R.string.Not_Logged_In_Title));
@@ -203,7 +225,6 @@ public class MainActivity extends AppCompatActivity {
             err += "\n ";
         }
     }
-
 
     public void initiateServerControls() {
         try {
@@ -293,6 +314,10 @@ public class MainActivity extends AppCompatActivity {
         return frgMng;
     }
 
+    public void setFrgMng(FragmentManager frgMng) {
+        this.frgMng = frgMng;
+    }
+
     public Fragment getActiveFragment() {
         return activeFragment;
     }
@@ -305,90 +330,152 @@ public class MainActivity extends AppCompatActivity {
         return controller;
     }
 
-    public void checkPermission(String permission, int requestCode)
-    {
-        // Checking if permission is not granted
-        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] { permission }, requestCode);
+    public static boolean checkAndRequestPermissions(final Activity context) {
+        int WExtstorePermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int cameraPermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.CAMERA);
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.CAMERA);
         }
-        else {
-            Toast.makeText(MainActivity.this, "Permission already granted", Toast.LENGTH_SHORT).show();
+        if (WExtstorePermission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded
+                    .add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(context, listPermissionsNeeded
+                            .toArray(new String[listPermissionsNeeded.size()]),
+                    REQUEST_ID_MULTIPLE_PERMISSIONS);
+            return false;
+        }
+        return true;
     }
-    public void imageCapturer() {
-        Intent image = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 
-        //requestPermissionLauncher.launch("Camera Permission");
-        //activityGetImage.launch(image);
-        checkPermission();
-    }
+    // Handled permission Result
 
-    public void imageChooser() {
-        Intent i = new Intent();
-        i.setType("image/*");
-        i.setAction(Intent.ACTION_GET_CONTENT);
-
-        activityGetImage.launch(i);
-    }
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults)
-    {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == CAMERA_PERMISSION_CODE) {
-
-            // Checking whether user granted the permission or not.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                // Showing the toast message
-                Toast.makeText(MainActivity.this, "Camera Permission Granted", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(MainActivity.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(MainActivity.this, "Storage Permission Granted", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(MainActivity.this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
-            }
+        switch (requestCode) {
+            case REQUEST_ID_MULTIPLE_PERMISSIONS:
+                if (ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(),
+                                    "FlagUp Requires Access to Camara.", Toast.LENGTH_SHORT)
+                            .show();
+                } else if (ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(),
+                            "FlagUp Requires Access to Your Storage.",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    chooseImage(MainActivity.this);
+                }
+                break;
         }
     }
 
-    ActivityResultLauncher<Intent> activityGetImage = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        ImageButton ibNewPicture = findViewById(R.id.ibNewPicture);
-        if (result.getResultCode()
-                == Activity.RESULT_OK) {
-            Intent data = result.getData();
-            if (data != null
-                    && data.getData() != null) {
-                Uri selectedImageUri = data.getData();
 
-
-                controller.setStrNewUserPicture(selectedImageUri.toString());
-
-                Bitmap selectedImageBitmap;
-                try {
-                    selectedImageBitmap
-                            = MediaStore.Images.Media.getBitmap(
-                            this.getContentResolver(),
-                            selectedImageUri);
-                    ibNewPicture.setImageBitmap(selectedImageBitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
+    // function to let's the user to choose image from camera or gallery
+    public void chooseImage(Context context) {
+        final CharSequence[] optionsMenu = {"Take Photo", "Choose from Gallery", "Exit"}; // create a menuOption Array
+        // create a dialog for showing the optionsMenu
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        // set the items in builder
+        builder.setItems(optionsMenu, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (optionsMenu[i].equals("Take Photo")) {
+                    // Open the camera and get the photo
+                    Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    takePicture.putExtra("requestCode", 2);
+                    intRequestCode = 2;
+                    mLauncher.launch(takePicture);
+                    // startActivityForResult(takePicture, 0);
+                } else if (optionsMenu[i].equals("Choose from Gallery")) {
+                    // choose from  external storage
+                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    // pickPhoto.putExtra("requestCode", 1);
+                    intRequestCode = 1;
+                    mLauncher.launch(pickPhoto);
+                    //startActivityForResult(pickPhoto , 1);
+                } else if (optionsMenu[i].equals("Exit")) {
+                    dialogInterface.dismiss();
                 }
             }
-        }
-    });
-    class RequestCode {
-        static final int INTERNAL_STORAGE = 100;
-        static final int EXTERNAL_STORAGE = 101;
-        static final int CAMERA_PERMISSION_CODE = 102;
+        });
+        builder.show();
     }
 
+    ActivityResultLauncher<Intent> mLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+
+                }
+
+
+            }
+    );
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        int intR = data.getIntExtra("requestCode", 0);
+        if (resultCode != RESULT_CANCELED) {
+            switch (intRequestCode) {//requestCode) {
+                case 2:
+                    if (resultCode == RESULT_OK && data != null) {
+                        try {
+                            Bundle extras = data.getExtras();
+                            Bitmap selectedImage = (Bitmap) extras.get("data");
+                            // Uri selectedImage = data.getData();
+                            controller.setStrNewUserPicture(selectedImage.toString());
+
+                            controller.setIBNewPicture((Bitmap) data.getExtras().get("data"));
+
+                            //ibNewUser.setImageBitmap(selectedI/mage2);
+                        } catch (Exception ex) {
+                            String err = "";
+                            err = ex.getMessage();
+                            err += "";
+                        }
+                    }
+                    break;
+                case 1:
+                    if (resultCode == RESULT_OK && data != null) {
+                        try {
+                            Uri selectedImage = data.getData();
+
+                            //Bundle extras = data.getExtras();
+                            //Uri selectedImage2 = (Uri) extras.get("data");
+                            //   Uri uriImage = Uri.
+
+                            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                            if (selectedImage != null) {
+                                Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                                if (cursor != null) {
+                                    cursor.moveToFirst();
+                                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                                    String picturePath = cursor.getString(columnIndex);
+
+                                    controller.setStrNewUserPicture(selectedImage.toString());
+
+                                    controller.setIBNewPicture(BitmapFactory.decodeFile(picturePath));
+                                    cursor.close();
+                                }
+                            }
+                        } catch (Exception ex) {
+                            String err = "";
+                            err = ex.getMessage();
+                            err += "";
+                        }
+                    }
+                    break;
+            }
+        }
+    }
 }

@@ -23,8 +23,8 @@
         \n User was not Created!
         \n Error Message: </string>
 
-    <string name="Suc_NewUserAdded_Title">Successfully created new User!</string>
-    <string name="Suc_NewUserAdded_Text">Creation of new user was successful</string>
+    <string name="Suc_IUD_Title">Operation completed successfully!</string>
+    <string name="Suc_IUD_Text">The operation was successfully completed by the server database</string>
 
     <string name="last_message_rec_Text">Last Message Type received: \n</string>
     <string name="sel_Item_Text">Selected Item: </string>
@@ -54,6 +54,8 @@
     <string name="Messages_Log">Messages Log</string>
     <string name="Title">Title</string>
 
+    <string name="rb_Receive">Receive</string>
+    <string name="rb_Not_Receive">Not Receive</string>
 
-
+    <string name="delete_entries">Clear entries</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.pepper2connect.controller;
 
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -12,11 +13,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.pepper2connect.Crypto.Decryption;
+import com.example.pepper2connect.Crypto.Encryption;
 import com.example.pepper2connect.Model.User;
 import com.example.pepper2connect.R;
 import com.example.pepper2connect.client.Client;
 import com.example.pepper2connect.messages.Message;
-import com.example.pepper2connect.messages.MessageInsert;
+import com.example.pepper2connect.messages.MessageI;
 import com.example.pepper2connect.messages.MessageSystem;
 import com.example.pepper2connect.messages.MessageType;
 import com.example.pepper2connect.messages.MessageUser;
@@ -160,16 +162,11 @@ public class Controller {
                     tvLoginInformation.setText(resources.getText(R.string.Error_Text) + strMessage);
                     tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
                     break;
-                case Unsuc_NewUserAdded:
-                    strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
-                    alertDialogBuilder.setTitle(resources.getText(R.string.Unsuc_NewUserAdded_Title));
-                    alertDialogBuilder.setMessage(resources.getText(R.string.Unsuc_NewUserAdded_Text) + strMessage);
-                    break;
-                case Suc_NewUserAdded:
+                case Suc_IUD:
 
                     strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
-                    alertDialogBuilder.setTitle(resources.getText(R.string.Suc_NewUserAdded_Title));
-                    alertDialogBuilder.setMessage(resources.getText(R.string.Suc_NewUserAdded_Text) + strMessage);
+                    alertDialogBuilder.setTitle(resources.getText(R.string.Suc_IUD_Title));
+                    alertDialogBuilder.setMessage(resources.getText(R.string.Suc_IUD_Text) + strMessage);
 
                     etNuTitle.setText("");
                     etNuFirstName.setText("");
@@ -297,17 +294,31 @@ public class Controller {
     /**
      * Fraggment NewUser
      */
-
+    Encryption e = new Encryption();
     public void addNewUser() {
-        MessageInsert msgNu = new MessageInsert(MessageType.NewUser
-                , etNuTitle.getText().toString()
-                , etNuFirstName.getText().toString()
-                , etNuLastName.getText().toString()
-                , strNewUserPicture
-                , (int) spRole.getSelectedItemId()
-                , etNuUserName.getText().toString()
-                , etNuPassword.getText().toString());
-        client.sendInsertMessage(msgNu);
+        MessageI msgi = new MessageI(e.encrypt(etNuTitle.getText().toString())
+                , e.encrypt(etNuFirstName.getText().toString())
+                , e.encrypt(etNuLastName.getText().toString())
+
+                , e.encrypt(strNewUserPicture)
+
+                , (int)spRole.getSelectedItemId()
+
+                , e.encrypt(etNuUserName.getText().toString())
+                , e.encrypt(etNuPassword.getText().toString())
+
+                ,
+        );
+        client.sendInsertMessage(msgi);
+    }
+    public void clearNewUser() {
+        etNuTitle.setText("");
+        etNuFirstName.setText("");
+        etNuLastName.setText("");
+        strNewUserPicture = "";
+        spRole.setSelection(0);
+        etNuUserName.setText("");
+        etNuPassword.setText("");
     }
 
     public void newPicture() {
@@ -325,12 +336,23 @@ public class Controller {
 
 
             if (msgU != null) {
-                currentUser = new User(Integer.parseInt(decryption.decrypt(msgU.getStrUserID()))
+                currentUser = new User(msgU.getIntEmployeeID()
                         , decryption.decrypt(msgU.getStrTitle())
                         , decryption.decrypt(msgU.getStrFirstname())
                         , decryption.decrypt(msgU.getStrLastname())
+
+                        , msgU.getIntPictureID()
                         , decryption.decrypt(msgU.getStrPicture())
-                        , msgU.getIntRoleID());
+
+                        , msgU.getIntRoleID()
+                        , decryption.decrypt(msgU.getStrRole())
+
+                        , msgU.getIntUserID()
+                        , decryption.decrypt(msgU.getStrUserName())
+                        , decryption.decrypt(msgU.getStrLastname())
+
+                        , msgU.getIntGetsConfidentialInfo()
+                );
             }
         } catch (Exception ex) {
             String err = ex.getMessage();
@@ -447,6 +469,12 @@ public class Controller {
         this.strNewUserPicture = strNewUserPicture;
     }
 
+    public void setIBNewPicture(Bitmap bmNewUserPicture) {
+        if (ibNewPicture != null && bmNewUserPicture != null) {
+            this.ibNewPicture.setImageBitmap(bmNewUserPicture);
+        }
+    }
+
     public void setIntNuRoleID(int intNuRoleID) {
         this.intNuRoleID = intNuRoleID;
     }
@@ -462,4 +490,6 @@ public class Controller {
     public void setSpRole(Spinner spRole) {
         this.spRole = spRole;
     }
+
+
 }

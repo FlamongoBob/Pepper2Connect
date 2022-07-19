@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.example.pepper2connect.controller.Controller;
 
-class Fragment_NewUser extends Fragment {
+public class Fragment_NewUser extends Fragment {
     public Fragment_NewUser() {
     }
 

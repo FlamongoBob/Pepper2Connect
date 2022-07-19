@@ -51,12 +51,12 @@ public class Client {
 
     /**
      * Sending Insert Messages
-     * @param messageInsert
+     * @param messageI
      *
      */
-    public void sendInsertMessage(MessageInsert messageInsert) {
+    public void sendInsertMessage(MessageI messageI) {
 
-        cModel.sendMessage(messageInsert);
+        cModel.sendMessage(messageI);
     }
     /*
 

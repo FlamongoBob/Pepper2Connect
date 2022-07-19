@@ -60,33 +60,41 @@ public class Clientmodel {
                             controller.appendLogServerCon((MessageSystem) msg);
 
                             if (msg.getType().equals(MessageType.Disconnect)) {
+
                                 controller.disconnectFromPepper((MessageSystem) msg);
 
                             } else if (msg.getType().equals(MessageType.Unsuccessful_LogIn)) {
+
                                 controller.disconnectFromPepper((MessageSystem) msg);
 
                             } else if (msg.getType().equals(MessageType.Successful_LogIn)) {
+
                                 controller.clientSuccessfulLogin((MessageSystem) msg);
 
                             } else if (msg.getType().equals(MessageType.LogOut)) {
+
                                 controller.disconnectFromPepper((MessageSystem) msg);
 
                             } else if (msg.getType().equals(MessageType.System)) {
 
                             } else if (msg.getType().equals(MessageType.Patient)) {
+
                                 controller.appendPatientInformation((MessageSystem) msg);
 
                             } else if (msg.getType().equals(MessageType.User)) {
+
                                 controller.fillCurrentUser((MessageUser) msg);
 
                             }else if (msg.getType().equals(MessageType.Error)) {
+
                                 controller.showInformation(msg);
 
                             }else if (msg.getType().equals(MessageType.Test)) {
+
                                 controller.appendLogServerCon((MessageSystem) msg);
-                            }else if (msg.getType().equals(MessageType.Suc_NewUserAdded)) {
-                                controller.showInformation((MessageSystem) msg);
-                            }else if (msg.getType().equals(MessageType.Unsuc_NewUserAdded)) {
+
+                            }else if (msg.getType().equals(MessageType.Suc_IUD)) {
+
                                 controller.showInformation((MessageSystem) msg);
                             }
                         }

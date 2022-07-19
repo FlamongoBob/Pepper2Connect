@@ -1,19 +1,23 @@
 package com.example.pepper2connect.messages;
 
-public class MessageInsert extends Message {
+public class MessageI  extends Message {
     private String strTitle, strFirstName, strLastName, strPicture, strUserName, strPassword;
-    private int intRoleID = -1, intEmployeeID = -1;
+    private int intRoleID = -1, intConfidentialInfoID = -1;
 
-    public MessageInsert(MessageType msgType
-            , String strTitle
+    public MessageI( String strTitle
             , String strFirstName
             , String strLastName
-            , String strPicture
-            , int intRoleID
-            , String strUserName
-            , String strPassword) {
 
-        super(msgType);
+            , String strPicture
+
+            , int intRoleID
+
+            , String strUserName
+            , String strPassword
+
+            , int intConfidentialInfoID) {
+
+        super(MessageType.InsertUser);
         this.strTitle = strTitle;
         this.strFirstName = strFirstName;
         this.strLastName = strLastName;
@@ -21,28 +25,22 @@ public class MessageInsert extends Message {
         this.intRoleID = intRoleID;
         this.strUserName = strUserName;
         this.strPassword = strPassword;
+        this.intConfidentialInfoID = intConfidentialInfoID;
     }
 
     @Override
     public String toString() {
         return type.toString() +
-                '|' + intEmployeeID +
                 '|' + strTitle +
                 '|' + strFirstName +
                 '|' + strLastName +
                 '|' + strPicture +
                 '|' + intRoleID +
                 '|' + strUserName +
-                '|' + strPassword;
+                '|' + strPassword +
+                '|' + intConfidentialInfoID;
     }
 
-    public int getIntEmployeeID() {
-        return intEmployeeID;
-    }
-
-    public void setIntEmployeeID(int intEmployeeID) {
-        this.intEmployeeID = intEmployeeID;
-    }
 
     public String getStrTitle() {
         return strTitle;
@@ -62,5 +60,17 @@ public class MessageInsert extends Message {
 
     public int getIntRoleID() {
         return intRoleID;
+    }
+
+    public String getStrUserName() {
+        return strUserName;
+    }
+
+    public String getStrPassword() {
+        return strPassword;
+    }
+
+    public int getIntConfidentialInfoID() {
+        return intConfidentialInfoID;
     }
 }

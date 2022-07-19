@@ -22,8 +22,8 @@
         \n Benutzer wurde nicht erstellt!
         \n Fehlermeldung: </string>
 
-    <string name="Suc_NewUserAdded_Title">Erfolgreich einen neuen Benutzer erstellt!</string>
-    <string name="Suc_NewUserAdded_Text">Erstellung eines neuen Benutzers war erfolgreich</string>
+    <string name="Suc_IUD_Title">Operation erfolgreich abgeschlossen!</string>
+    <string name="Suc_IUD_Text">Die Operation wurde von der Serverdatenbank erfolgreich abgeschlossen</string>
 
     <string name="last_message_rec_Text">Zuletzt empfangener Nachrichtentyp: \n</string>
     <string name="sel_Item_Text">Ausgewähltes Element: </string>
@@ -52,6 +52,11 @@
     <string name="Disconnected">Getrennt</string>
     <string name="Messages_Log">Meldungen Protokoll</string>
     <string name="Title">Title</string>
+
+    <string name="rb_Receive">Empfangen</string>
+    <string name="rb_Not_Receive">Nicht Empfangen</string>
+
+    <string name="delete_entries">Eingaben löschen</string>
 
 
 </resources>

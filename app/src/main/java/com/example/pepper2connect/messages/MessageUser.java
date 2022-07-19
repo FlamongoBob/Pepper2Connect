@@ -3,34 +3,88 @@ package com.example.pepper2connect.messages;
 import com.example.pepper2connect.Crypto.Decryption;
 import com.example.pepper2connect.Crypto.Encryption;
 
-public class MessageUser extends Message{
-    private int intUserID;
-    private String strUserID;
+public class MessageUser extends Message {
+    private int intEmployeeID;
     private String strTitle;
     private String strFirstname;
     private String strLastname;
-    private String strPicture;
-    private int intRoleID;
-    Encryption e = new Encryption();
-    Decryption d = new Decryption();
 
-    public MessageUser(int intUserID,String strTitle, String strFirstname, String strLastname) {
+    private int intPictureID;
+    private String strPicture;
+
+    private int intRoleID;
+    private String strRole;
+
+    private int intUserID;
+    private String strUserName;
+    private String strPassword;
+
+    private int intGetsConfidentialInfo;
+
+
+    public MessageUser(int intEmployeeID
+            , String strTitle
+            , String strFirstname
+            , String strLastname
+
+            , int intPictureID
+            , String strPicture
+
+            , int intRoleID
+            , String strRole
+
+            , int intUserID
+            , String strUserName
+            , String strPassword
+
+            , int intGetsConfidentialInfo) {
+
         super(MessageType.User);
-        this.strUserID = e.encrypt(Integer.toString(intUserID));
-        this.strTitle = e.encrypt(strTitle);
-        this.strFirstname = e.encrypt(strFirstname);
-        this.strLastname = e.encrypt(strLastname);
-        this.strPicture = e.encrypt(strPicture);
+
+        this.intEmployeeID = intEmployeeID;
+        this.strTitle = strTitle;
+        this.strFirstname = strFirstname;
+        this.strLastname = strLastname;
+
+        this.intPictureID = intPictureID;
+        this.strPicture = strPicture;
+
         this.intRoleID = intRoleID;
+        this.strRole = strRole;
+
+        this.intUserID = intUserID;
+        this.strUserName = strUserName;
+        this.strPassword = strPassword;
+
+        this.intGetsConfidentialInfo = intGetsConfidentialInfo;
+
+
+
     }
 
     @Override
     public String toString() {
-        return type.toString() + '|' + strUserID + '|' + strTitle + '|' + strFirstname+ '|' + strLastname+ '|' + strPicture+ '|' + intRoleID;
+        return type.toString() +
+                '|' + intEmployeeID +
+                '|' + strTitle +
+                '|' + strFirstname +
+                '|' + strLastname +
+
+                '|' + intPictureID +
+                '|' + strPicture +
+
+                '|' + intRoleID +
+                '|' + strRole +
+
+                '|' + intUserID +
+                '|' + strUserName +
+                '|' + strPassword
+                +
+                '|' + intGetsConfidentialInfo;
     }
 
-    public int getIntUserID() {
-        return intUserID;
+    public int getIntEmployeeID() {
+        return intEmployeeID;
     }
 
     public String getStrTitle() {
@@ -45,6 +99,10 @@ public class MessageUser extends Message{
         return strLastname;
     }
 
+    public int getIntPictureID() {
+        return intPictureID;
+    }
+
     public String getStrPicture() {
         return strPicture;
     }
@@ -53,7 +111,23 @@ public class MessageUser extends Message{
         return intRoleID;
     }
 
-    public String getStrUserID() {
-        return strUserID;
+    public String getStrRole() {
+        return strRole;
+    }
+
+    public int getIntUserID() {
+        return intUserID;
+    }
+
+    public String getStrUserName() {
+        return strUserName;
+    }
+
+    public String getStrPassword() {
+        return strPassword;
+    }
+
+    public int getIntGetsConfidentialInfo() {
+        return intGetsConfidentialInfo;
     }
 }

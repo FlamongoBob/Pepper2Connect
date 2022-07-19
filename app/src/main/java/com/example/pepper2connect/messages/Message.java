@@ -98,14 +98,30 @@ public abstract class Message {
                     message.setType(MessageType.Test);
 
                 } else if (parts[0].equals(MessageType.User.toString())) {
-                    message = new MessageUser(Integer.parseInt(parts[1]),parts[2],parts[3],parts[4]);
+                    message = new MessageUser(Integer.parseInt(parts[1])
+                            ,parts[2]
+                            ,parts[3]
+                            ,parts[4]
+
+                            ,Integer.parseInt(parts[5])
+                            ,parts[6]
+
+                            ,Integer.parseInt(parts[7])
+                            ,parts[8]
+
+                            ,Integer.parseInt(parts[9])
+                            ,parts[10]
+                            ,parts[11]
+
+                            ,Integer.parseInt(parts[12])
+                    );
                     message.setType(MessageType.User);
-                } else if (parts[0].equals(MessageType.Suc_NewUserAdded.toString())) {
+                } else if (parts[0].equals(MessageType.Suc_IUD.toString())) {
                     message = new MessageSystem(parts[1]);
-                    message.setType(MessageType.Suc_NewUserAdded);
-                } else if (parts[0].equals(MessageType.Unsuc_NewUserAdded.toString())) {
+                    message.setType(MessageType.Suc_IUD);
+                } else if (parts[0].equals(MessageType.Error.toString())) {
                     message = new MessageSystem(parts[1]);
-                    message.setType(MessageType.Unsuc_NewUserAdded);
+                    message.setType(MessageType.Error);
                 }
             }
         } catch (IOException e) {

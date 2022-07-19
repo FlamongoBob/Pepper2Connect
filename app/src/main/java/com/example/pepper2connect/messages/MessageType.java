@@ -12,10 +12,10 @@ public enum MessageType {
     , Patient
     , Error
     , Test
-    , NewUser
+    , InsertUser
     , UpdateUser
-    , Unsuc_NewUserAdded
-    , Suc_NewUserAdded;
+    , DeleteUser
+    , Suc_IUD;
 
 }
 

@@ -6,11 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragment_NewUser">
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="-127dp">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/clNewUser2"
             android:layout_width="match_parent"
@@ -22,7 +24,7 @@
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginEnd="10dp"
                 android:autofillHints=""
                 android:ems="10"
@@ -38,7 +40,7 @@
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginEnd="10dp"
                 android:autofillHints=""
                 android:ems="10"
@@ -54,7 +56,7 @@
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginEnd="10dp"
                 android:autofillHints=""
                 android:ems="10"
@@ -64,7 +66,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.407"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/spNuRole" />
+                app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
             <EditText
                 android:id="@+id/etNuPassword"
@@ -83,13 +85,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etNuUserName" />
 
-            <Spinner
+            <EditText
                 android:id="@+id/spNuTitle"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="11dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginEnd="10dp"
+                android:hint="@string/Title"
                 android:minHeight="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -100,7 +103,7 @@
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginEnd="10dp"
                 android:minHeight="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -111,27 +114,79 @@
                 android:id="@+id/ibNewPicture"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
                 android:layout_marginStart="17dp"
                 android:layout_marginTop="7dp"
                 android:layout_marginEnd="243dp"
+                android:adjustViewBounds="true"
+                android:maxWidth="250dp"
+
+                android:maxHeight="100dp"
+                android:minWidth="250dp"
+                android:minHeight="100dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@tools:sample/avatars" />
 
             <Button
-                android:id="@+id/btnAddNu"
+                android:id="@+id/btnAddNewUser"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="19dp"
                 android:layout_marginEnd="10dp"
-                android:minHeight="60dp"
                 android:hint="@string/addNewUser"
+                android:minHeight="60dp"
                 android:onClick="addNewUser"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etNuPassword" />
+
+            <Button
+                android:id="@+id/btnNewUserClear"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="19dp"
+                android:layout_marginEnd="10dp"
+                android:hint="@string/delete_entries"
+                android:minHeight="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnAddNewUser" />
+
+            <RadioGroup
+                android:id="@+id/radioGroup"
+                android:layout_width="0"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="10dp"
+                android:minHeight="120dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spNuRole">
+
+                <RadioButton
+                    android:id="@+id/rb_Receive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="60dp"
+                    android:text="@string/rb_Receive"
+                    tools:layout_editor_absoluteX="145dp"
+                    tools:layout_editor_absoluteY="461dp" />
+
+                <RadioButton
+                    android:id="@+id/rb_Not_Receive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="60dp"
+                    android:text="@string/rb_Not_Receive"
+                    tools:layout_editor_absoluteX="277dp"
+                    tools:layout_editor_absoluteY="461dp" />
+            </RadioGroup>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
