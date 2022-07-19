@@ -6,14 +6,18 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.pepper2connect.Crypto.Decryption;
 import com.example.pepper2connect.Crypto.Encryption;
+import com.example.pepper2connect.MainActivity;
 import com.example.pepper2connect.Model.User;
 import com.example.pepper2connect.R;
 import com.example.pepper2connect.client.Client;
@@ -24,6 +28,7 @@ import com.example.pepper2connect.messages.MessageType;
 import com.example.pepper2connect.messages.MessageUser;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -51,22 +56,36 @@ public class Controller {
 
     TextView tvLoginInformation;
 
-
+    MainActivity mainActivity;
     //New User Controlls
     EditText etNuFirstName, etNuTitle, etNuLastName, etNuPassword, etNuUserName;
     String strNewUserPicture;
-    Spinner spTitle, spRole;
+    Spinner spRole;
     int intNuRoleID, intNuTitleID;
     ImageButton ibNewPicture;
+    RadioGroup rgConfidential;
+    RadioButton rb_RConfidential, rb_NConfidential;
     //----
+
+    //UserManagment Controlls
+    ArrayList<User> allUsers = new ArrayList<>();
+    EditText etUMFirstName, etUMTitle, etUMLastName, etUMPassword, etUMUserName;
+    String strUMPicture;
+    Spinner spUMRole;
+    int intUMRoleID, intUserID, intEmployeeID, intPictureID;
+    ImageButton ibUMPicture;
+    RadioGroup rgConfidentialUM;
+    RadioButton rb_RConfidentialUM, rb_NConfidentialUM;
+    //----
+
 
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
 
     private String strBufferPatientInfo = "", strBufferLogServerCon = "";
 
-    public Controller() {
-
+    public Controller(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 
     public void connect2Pepper(String strUsername, String strPassword) {
@@ -295,22 +314,51 @@ public class Controller {
      * Fraggment NewUser
      */
     Encryption e = new Encryption();
+
     public void addNewUser() {
-        MessageI msgi = new MessageI(e.encrypt(etNuTitle.getText().toString())
-                , e.encrypt(etNuFirstName.getText().toString())
-                , e.encrypt(etNuLastName.getText().toString())
+        int intRConfidentialInfoID = -1;
+        MessageI msgI = null;
+        int intCheckedID = rgConfidential.getCheckedRadioButtonId();
 
-                , e.encrypt(strNewUserPicture)
 
-                , (int)spRole.getSelectedItemId()
+            if (intCheckedID == rb_NConfidential.getId()) {
+                msgI = new MessageI(e.encrypt(etNuTitle.getText().toString())
+                        , e.encrypt(etNuFirstName.getText().toString())
+                        , e.encrypt(etNuLastName.getText().toString())
 
-                , e.encrypt(etNuUserName.getText().toString())
-                , e.encrypt(etNuPassword.getText().toString())
+                        , e.encrypt(strNewUserPicture)
 
-                ,
-        );
-        client.sendInsertMessage(msgi);
+                        , (int) spRole.getSelectedItemId()
+
+                        , e.encrypt(etNuUserName.getText().toString())
+                        , e.encrypt(etNuPassword.getText().toString())
+
+                        , 0
+                );
+            } else if (intCheckedID == rb_RConfidential.getId()) {
+                msgI = new MessageI(e.encrypt(etNuTitle.getText().toString())
+                        , e.encrypt(etNuFirstName.getText().toString())
+                        , e.encrypt(etNuLastName.getText().toString())
+
+                        , e.encrypt(strNewUserPicture)
+
+                        , (int) spRole.getSelectedItemId()
+
+                        , e.encrypt(etNuUserName.getText().toString())
+                        , e.encrypt(etNuPassword.getText().toString())
+
+                        , 1
+                );
+            }
+
+        if (msgI != null) {
+            Toast.makeText(mainActivity, "Please Select if the user receives Confidential Information", Toast.LENGTH_SHORT).show();
+        } else {
+            client.sendInsertMessage(msgI);
+        }
+
     }
+
     public void clearNewUser() {
         etNuTitle.setText("");
         etNuFirstName.setText("");
@@ -325,6 +373,26 @@ public class Controller {
 
 
     }
+    /**
+     * UserManagement
+     */
+
+    public void getAllEmployeeData(){
+        MessageSystem msgSys = new MessageSystem("");
+        msgSys.setType(MessageType.AllUser);
+        client.sendSysMessage(msgSys);
+    }
+
+    public void populateArrayAllUsers(User user){
+
+        allUsers.add(user);
+    }
+
+    public void populateUserManagementControlls(){
+
+    }
+
+
 
 
     /**
@@ -445,12 +513,21 @@ public class Controller {
         this.etNuFirstName = etNuFirstName;
     }
 
-    public void setIBNewPicture(ImageButton ibNewPicture) {
-        this.ibNewPicture = ibNewPicture;
+    public void setRgConfidential(RadioGroup rg) {
+        this.rgConfidential = rg;
     }
 
-    public void setEtNuTitle(EditText etNuTitle) {
-        this.etNuTitle = etNuTitle;
+    public void setRb_RConfidential(RadioButton rb_RConfidential) {
+        this.rb_RConfidential = rb_RConfidential;
+    }
+
+    public void setRb_NConfidential(RadioButton rb_NConfidential) {
+        this.rb_NConfidential = rb_NConfidential;
+    }
+
+
+    public void setIBNewPicture(ImageButton ibNewPicture) {
+        this.ibNewPicture = ibNewPicture;
     }
 
     public void setEtNuLastName(EditText etNuLastName) {
@@ -483,13 +560,59 @@ public class Controller {
         this.intNuTitleID = intNuTitleID;
     }
 
-    public void setSpTitle(Spinner spTitle) {
-        this.spTitle = spTitle;
+    public void setEtNuTitle(EditText etNuTitle) {
+        this.etNuTitle = etNuTitle;
     }
 
     public void setSpRole(Spinner spRole) {
         this.spRole = spRole;
     }
 
+    public void setEtUMFirstName(EditText etUMFirstName) {
+        this.etUMFirstName = etUMFirstName;
+    }
 
+    public void setEtUMTitle(EditText etUMTitle) {
+        this.etUMTitle = etUMTitle;
+    }
+
+    public void setEtUMLastName(EditText etUMLastName) {
+        this.etUMLastName = etUMLastName;
+    }
+
+    public void setEtUMPassword(EditText etUMPassword) {
+        this.etUMPassword = etUMPassword;
+    }
+
+    public void setEtUMUserName(EditText etUMUserName) {
+        this.etUMUserName = etUMUserName;
+    }
+
+    public void setStrUMPicture(String strUMPicture) {
+        this.strUMPicture = strUMPicture;
+    }
+
+    public void setSpUMRole(Spinner spUMRole) {
+        this.spUMRole = spUMRole;
+    }
+
+    public void setIntUMRoleID(int intUMRoleID) {
+        this.intUMRoleID = intUMRoleID;
+    }
+
+    public void setIbUMPicture(ImageButton ibUMPicture) {
+        this.ibUMPicture = ibUMPicture;
+    }
+
+    public void setRgConfidentialUM(RadioGroup rgConfidentialUM) {
+        this.rgConfidentialUM = rgConfidentialUM;
+    }
+
+    public void setRb_RConfidentialUM(RadioButton rb_RConfidentialUM) {
+        this.rb_RConfidentialUM = rb_RConfidentialUM;
+    }
+
+    public void setRb_NConfidentialUM(RadioButton rb_NConfidentialUM) {
+        this.rb_NConfidentialUM = rb_NConfidentialUM;
+    }
 }

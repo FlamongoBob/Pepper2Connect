@@ -57,6 +57,8 @@
     <string name="rb_Not_Receive">Nicht Empfangen</string>
 
     <string name="delete_entries">Eingaben löschen</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

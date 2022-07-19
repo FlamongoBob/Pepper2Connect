@@ -1,32 +1,12 @@
 package com.example.pepper2connect;
 
-import static android.app.Activity.RESULT_OK;
-
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import android.provider.MediaStore;
-import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,13 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.example.pepper2connect.controller.Controller;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.Inflater;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,6 +33,7 @@ public class Fragment_Profile extends Fragment {
     Fragment activeFragment_frgMngProfile;
     Fragment_NewUser fragment_newUser;// = new Fragment_NewUser();
     private boolean isCreatedNewUser = false;
+    private boolean isCreatedUserManagement = false;
 
 
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
@@ -112,18 +88,36 @@ public class Fragment_Profile extends Fragment {
                         mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_newUser).commit();
                         mainActivity.activeFragment = mainActivity.fragment_newUser;
                         //mainActivity.setActiveFragment(activeFragment);// = fragment_newUser;
-                       // mainActivity.setFrgMng(frgMng);
+                        // mainActivity.setFrgMng(frgMng);
 
                         if (!isCreatedNewUser) {
                             initiateNewUserControls();
                         }
                         return true;
                     }
+
+
+                    return false;
                 } catch (Exception ex) {
                     String err = ex.getMessage();
                     err += "";
                 }
-                return true;
+            case R.id.UserManagement:
+                try {
+                    if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgUserManagement").getTag())) {
+                        mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_userManagement).commit();
+                        mainActivity.activeFragment = mainActivity.fragment_userManagement;
+
+                        if (!isCreatedUserManagement) {
+                            initiateUserManagementControls();
+                        }
+                        return true;
+                    }
+                    return false;
+                } catch (Exception ex) {
+                    String err = ex.getMessage();
+                    err += "";
+                }
             default:
 
                 return super.onOptionsItemSelected(item);
@@ -134,7 +128,7 @@ public class Fragment_Profile extends Fragment {
         ImageButton ibNewPicture = mainActivity.findViewById(R.id.ibNewPicture);
         controller.setIBNewPicture(ibNewPicture);
         ibNewPicture.setOnClickListener(view -> {
-           if(mainActivity.checkAndRequestPermissions(mainActivity)){
+            if (mainActivity.checkAndRequestPermissions(mainActivity)) {
                 mainActivity.chooseImage(mainActivity);
             }
         });
@@ -151,8 +145,8 @@ public class Fragment_Profile extends Fragment {
         EditText etNuUserName = mainActivity.findViewById(R.id.etNuUserName);
         controller.setEtNuUserName(etNuUserName);
 
-        Spinner spNuTitle = mainActivity.findViewById(R.id.spNuTitle);
-        controller.setSpTitle(spNuTitle);
+        EditText etNuTitle = mainActivity.findViewById(R.id.etNuTitle);
+        controller.setEtNuTitle(etNuTitle);
 
         Spinner spNuRole = mainActivity.findViewById(R.id.spNuRole);
         controller.setSpRole(spNuRole);
@@ -167,8 +161,63 @@ public class Fragment_Profile extends Fragment {
             controller.clearNewUser();
         });
 
+    }
+
+    /**
+     * TODO MESSAGE GET ALL EMPLOYEES
+     */
+
+    private void initiateUserManagementControls() {
+
+
+        ImageButton ibNewPicture = mainActivity.findViewById(R.id.ibNewPicture);
+        controller.setIBNewPicture(ibNewPicture);
+        ibNewPicture.setOnClickListener(view -> {
+            if (mainActivity.checkAndRequestPermissions(mainActivity)) {
+                mainActivity.chooseImage(mainActivity);
+            }
+        });
+
+        EditText etUMFirstName = mainActivity.findViewById(R.id.etUMFirstName);
+        controller.setEtUMFirstName(etUMFirstName);
+
+        EditText etUMLastName = mainActivity.findViewById(R.id.etUMLastName);
+        controller.setEtUMLastName(etUMLastName);
+
+        EditText etUMPassword = mainActivity.findViewById(R.id.etUMPassword);
+        controller.setEtUMPassword(etUMPassword);
+
+        EditText etUMUserName = mainActivity.findViewById(R.id.etUMUserName);
+         controller.setEtUMUserName(etUMUserName);
+
+        EditText etUMTitle = mainActivity.findViewById(R.id.etUMTitle);
+         controller.setEtUMTitle(etUMTitle);
+
+        Spinner spUMRole = mainActivity.findViewById(R.id.spUMRole);
+         controller.setSpUMRole(spUMRole);
+
+        Button btnUMSaveChanges = mainActivity.findViewById(R.id.btnUMSaveChanges);
+        btnUMSaveChanges.setOnClickListener(view -> {
+            //controller.addNewUser();
+        });
+
+        Button btnUMDeleteUser = mainActivity.findViewById(R.id.btnUMDeleteUser);
+        btnUMDeleteUser.setOnClickListener(view -> {
+            // controller.clearNewUser();
+        });
+
+        Button btnUMPrevious = mainActivity.findViewById(R.id.btnUMPrevious);
+        btnUMPrevious.setOnClickListener(view -> {
+            // controller.clearNewUser();
+        });
+
+        Button btnUMNext = mainActivity.findViewById(R.id.btnUMNext);
+        btnUMNext.setOnClickListener(view -> {
+            // controller.clearNewUser();
+        });
 
     }
+
 
     public void setFragment_newUser(Fragment_NewUser fragment_newUser) {
         this.fragment_newUser = fragment_newUser;

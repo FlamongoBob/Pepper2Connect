@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/clNewUser1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment_NewUser">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragment_UserManagement">
+
 
     <ScrollView
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             tools:context=".Fragment_NewUser">
 
             <EditText
-                android:id="@+id/etNuFirstName"
+                android:id="@+id/etUMFirstName"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
@@ -33,10 +33,10 @@
                 android:minHeight="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etNuTitle" />
+                app:layout_constraintTop_toBottomOf="@+id/etUMTitle" />
 
             <EditText
-                android:id="@+id/etNuLastName"
+                android:id="@+id/etUMLastName"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
@@ -49,10 +49,10 @@
                 android:minHeight="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etNuFirstName" />
+                app:layout_constraintTop_toBottomOf="@+id/etUMFirstName" />
 
             <EditText
-                android:id="@+id/etNuUserName"
+                android:id="@+id/etUMUserName"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
@@ -66,10 +66,10 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.407"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+                app:layout_constraintTop_toBottomOf="@+id/radioGroupUM" />
 
             <EditText
-                android:id="@+id/etNuPassword"
+                android:id="@+id/etUMPassword"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
@@ -83,10 +83,10 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.481"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etNuUserName" />
+                app:layout_constraintTop_toBottomOf="@+id/etUMUserName" />
 
             <EditText
-                android:id="@+id/etNuTitle"
+                android:id="@+id/etUMTitle"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
@@ -96,10 +96,10 @@
                 android:minHeight="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ibNewPicture" />
+                app:layout_constraintTop_toBottomOf="@+id/ibUMPicture" />
 
             <Spinner
-                android:id="@+id/spNuRole"
+                android:id="@+id/spUMRole"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="10dp"
@@ -108,10 +108,10 @@
                 android:minHeight="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etNuLastName" />
+                app:layout_constraintTop_toBottomOf="@+id/etUMLastName" />
 
             <ImageButton
-                android:id="@+id/ibNewPicture"
+                android:id="@+id/ibUMPicture"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -130,35 +130,34 @@
                 tools:src="@tools:sample/avatars" />
 
             <Button
-                android:id="@+id/btnAddNewUser"
+                android:id="@+id/btnUMSaveChanges"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="19dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
-                android:hint="@string/addNewUser"
                 android:minHeight="60dp"
-                android:onClick="addNewUser"
+                android:text="Save Changes"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etNuPassword" />
+                app:layout_constraintTop_toBottomOf="@+id/etUMPassword" />
 
             <Button
-                android:id="@+id/btnNewUserClear"
+                android:id="@+id/btnUMDeleteUser"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="19dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
-                android:hint="@string/delete_entries"
                 android:minHeight="60dp"
+                android:text="Benutzer Löschen"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnAddNewUser" />
+                app:layout_constraintTop_toBottomOf="@+id/btnUMSaveChanges" />
 
             <RadioGroup
-                android:id="@+id/radioGroup"
+                android:id="@+id/radioGroupUM"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -167,10 +166,10 @@
                 android:minHeight="120dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/spNuRole">
+                app:layout_constraintTop_toBottomOf="@+id/spUMRole">
 
                 <RadioButton
-                    android:id="@+id/rb_Receive"
+                    android:id="@+id/rb_ReceiveUM"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="60dp"
@@ -179,7 +178,7 @@
                     tools:layout_editor_absoluteY="461dp" />
 
                 <RadioButton
-                    android:id="@+id/rb_Not_Receive"
+                    android:id="@+id/rb_Not_ReceiveUM"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="60dp"
@@ -188,7 +187,36 @@
                     tools:layout_editor_absoluteY="461dp" />
             </RadioGroup>
 
+            <Button
+                android:id="@+id/btnUMNext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="1dp"
+                android:minWidth="80dp"
+                android:minHeight="60dp"
+                android:text="Nächster"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnUMDeleteUser" />
+
+            <Button
+                android:id="@+id/btnUMPrevious"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="2dp"
+                android:minWidth="80dp"
+                android:minHeight="60dp"
+                android:text="Vorher"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnUMDeleteUser" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

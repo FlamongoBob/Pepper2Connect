@@ -3,4 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/New_User"
         android:title="@string/addNewUser" />
+    <item android:id="@+id/UserManagement"
+        android:title="UserManagement" />
 </menu>
