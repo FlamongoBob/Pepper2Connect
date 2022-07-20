@@ -48,6 +48,15 @@ public class Client {
 
         cModel.sendMessage(messageSystem);
     }
+    public void sendUpadetMessage(MessageU msgU) {
+
+        cModel.sendMessage(msgU);
+    }
+
+    public void sendDeleteMessage(MessageD msgD) {
+            cModel.sendMessage(msgD);
+
+    }
 
     /**
      * Sending Insert Messages

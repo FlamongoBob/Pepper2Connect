@@ -17,6 +17,7 @@ public class User {
     private String strUserName;
     private String strPassword;
 
+    private int intConfidentialID;
     private int intGetsConfidentialInfo;
 
     public User(int intEmployeeID
@@ -34,6 +35,7 @@ public class User {
             , String strUserName
             , String strPassword
 
+                , int intConfidentialID
             , int intGetsConfidentialInfo) {
 
         this.intEmployeeID = intEmployeeID;
@@ -51,6 +53,7 @@ public class User {
         this.strUserName = strUserName;
         this.strPassword = strPassword;
 
+        this.intConfidentialID = intConfidentialID;
         this.intGetsConfidentialInfo = intGetsConfidentialInfo;
     }
 
@@ -67,6 +70,7 @@ public class User {
                 '|' + intUserID +
                 '|' + strUserName +
                 '|' + strPassword +
+                '|' + intConfidentialID+
                 '|' + intGetsConfidentialInfo;
     }
 
@@ -117,6 +121,28 @@ public class User {
     public int getIntRoleID() {
         return intRoleID;
     }
+
+    public int getIntConfidentialID() {
+        return intConfidentialID;
+    }
+
+    public void setStrTitle(String strTitle) {
+        this.strTitle = strTitle;
+    }
+
+    public void setStrFirstname(String strFirstname) {
+        this.strFirstname = strFirstname;
+    }
+
+    public void setStrLastname(String strLastname) {
+        this.strLastname = strLastname;
+    }
+
+    public void setStrPassword(String strPassword) {
+        this.strPassword = strPassword;
+    }
+
+
 
 
 }

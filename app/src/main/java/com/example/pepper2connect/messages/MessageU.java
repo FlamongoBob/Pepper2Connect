@@ -2,7 +2,7 @@ package com.example.pepper2connect.messages;
 
 public class MessageU  extends Message {
     private String strTitle, strFirstName, strLastName, strPicture, strUserName, strPassword;
-    private int intUserID = -1, intEmployeeID = -1, intPictureID = -1, intRoleID = -1, intConfidentialID = -1;
+    private int intUserID = -1, intEmployeeID = -1, intPictureID = -1, intRoleID = -1, intConfidentialID =-1 ,intGetsConfidentialInfo = -1;
 
     public MessageU( int intEmployeeID
             , String strTitle
@@ -17,7 +17,9 @@ public class MessageU  extends Message {
             , String strPassword
 
             , int intRoleID
-            , int intConfidentialID) {
+
+            , int intConfidentialID
+            , int intGetsConfidentialInfo) {
 
         super(MessageType.UpdateUser);
         this.intEmployeeID = intEmployeeID;
@@ -33,7 +35,9 @@ public class MessageU  extends Message {
         this.strPassword = strPassword;
 
         this.intRoleID = intRoleID;
+
         this.intConfidentialID = intConfidentialID;
+        this.intGetsConfidentialInfo = intGetsConfidentialInfo;
     }
 
     @Override
@@ -52,7 +56,9 @@ public class MessageU  extends Message {
                 '|' + strPassword +
 
                 '|' + intRoleID +
-                '|' + intRoleID;
+
+                '|' + intConfidentialID+
+                '|' + intGetsConfidentialInfo;
     }
 
     public String getStrTitle() {
@@ -93,6 +99,10 @@ public class MessageU  extends Message {
 
     public int getIntRoleID() {
         return intRoleID;
+    }
+
+    public int getIntGetsConfidentialInfo() {
+        return intGetsConfidentialInfo;
     }
 
     public int getIntConfidentialID() {

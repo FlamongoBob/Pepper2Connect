@@ -3,9 +3,14 @@ package com.example.pepper2connect.controller;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Base64;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -13,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 
 import com.example.pepper2connect.Crypto.Decryption;
 import com.example.pepper2connect.Crypto.Encryption;
@@ -22,11 +26,15 @@ import com.example.pepper2connect.Model.User;
 import com.example.pepper2connect.R;
 import com.example.pepper2connect.client.Client;
 import com.example.pepper2connect.messages.Message;
+import com.example.pepper2connect.messages.MessageD;
 import com.example.pepper2connect.messages.MessageI;
+import com.example.pepper2connect.messages.MessageRoles;
 import com.example.pepper2connect.messages.MessageSystem;
 import com.example.pepper2connect.messages.MessageType;
+import com.example.pepper2connect.messages.MessageU;
 import com.example.pepper2connect.messages.MessageUser;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,13 +58,16 @@ public class Controller {
 
     private User currentUser;
 
-    EditText etLogServerCon, etPatientInformation, etLoginPassword, etLoginUserName, etProfileFirstName, etProfileTitle, etProfileLastName;
+    EditText etLogServerCon, etPatientInformation, etLoginPassword, etLoginUserName;
+
 
     String strUsername = "Test";
 
     TextView tvLoginInformation;
 
     MainActivity mainActivity;
+
+
     //New User Controlls
     EditText etNuFirstName, etNuTitle, etNuLastName, etNuPassword, etNuUserName;
     String strNewUserPicture;
@@ -65,17 +76,6 @@ public class Controller {
     ImageButton ibNewPicture;
     RadioGroup rgConfidential;
     RadioButton rb_RConfidential, rb_NConfidential;
-    //----
-
-    //UserManagment Controlls
-    ArrayList<User> allUsers = new ArrayList<>();
-    EditText etUMFirstName, etUMTitle, etUMLastName, etUMPassword, etUMUserName;
-    String strUMPicture;
-    Spinner spUMRole;
-    int intUMRoleID, intUserID, intEmployeeID, intPictureID;
-    ImageButton ibUMPicture;
-    RadioGroup rgConfidentialUM;
-    RadioButton rb_RConfidentialUM, rb_NConfidentialUM;
     //----
 
 
@@ -264,13 +264,74 @@ public class Controller {
      * Fragment_Profile
      */
 
-    public void fillProfile(Fragment fragment_profile) {
-        if (currentUser != null && etProfileTitle != null && etProfileFirstName != null && etProfileLastName != null) {
+    //Profile Controlls
+    EditText etProfileLastName, etProfileTitle, etProfileFirstName, etProfileRole, etProfileConfidentialInfo, etProfileUserName, etProfilePassword;
+    ImageView ivProfilePicture;
+    Button btnProfileUpdate;
+    RadioGroup rgProfile;
+    RadioButton rb_RConfidentalProfile, rb_NConfidentalProfile;
+
+    public void fillProfile() {
+        if (currentUser != null && etProfileTitle != null && etProfileFirstName != null && etProfileLastName != null
+                && etProfileRole != null && etProfileConfidentialInfo != null && etProfileUserName != null && etProfilePassword != null
+                && rb_RConfidentalProfile != null && rb_NConfidentalProfile != null
+        ) {
+            setIBNewPicture(StringToBitMap(currentUser.getStrPicture()), ivProfilePicture);
+
             etProfileTitle.setText(currentUser.getStrTitle());
             etProfileFirstName.setText(currentUser.getStrFirstname());
             etProfileLastName.setText(currentUser.getStrLastname());
+            etProfileUserName.setText(currentUser.getStrUserName());
+            etProfilePassword.setText(currentUser.getStrPassword());
+            etProfileRole.setText(currentUser.getStrRole());
+            etProfileConfidentialInfo.setText(currentUser.getStrFirstname());
+
+            if (currentUser.getIntConfidentialID() == 1) {
+                rb_RConfidentalProfile.setChecked(true);
+            } else {
+                rb_RConfidentalProfile.setChecked(true);
+            }
+
+        }
+    }
 
 
+    public void updateProfile() {
+        try {
+            currentUser.setStrTitle(etProfileTitle.getText().toString());
+            currentUser.setStrFirstname(etProfileFirstName.getText().toString());
+            currentUser.setStrLastname(etProfileLastName.getText().toString());
+            currentUser.setStrPassword(etProfilePassword.getText().toString());
+
+                      /*
+            User newUser = new User(currentUser.getIntEmployeeID()
+                    , currentUser.getStrTitle()
+                    , currentUser.getStrFirstname()
+                    , currentUser.getStrLastname()
+
+                    , currentUser.getIntPictureID()
+                    , currentUser.getStrPicture()
+
+                    , currentUser.getIntRoleID()
+                    , currentUser.getStrRole()
+
+                    , currentUser.getIntUserID()
+                    , currentUser.getStrUserName()
+                    , currentUser.getStrPassword()
+
+                    , currentUser.getIntConfidentialID()
+                    , currentUser.getIntGetsConfidentialInfo()
+            );
+            */
+            sendUpdateUser(currentUser);
+
+        } catch (Exception ex) {
+
+            Toast.makeText(mainActivity, "Something went wrong with the update! Please try again!", Toast.LENGTH_LONG);
+
+            String err = "";
+            err = ex.getMessage();
+            err += "";
         }
     }
 
@@ -313,12 +374,15 @@ public class Controller {
     /**
      * Fraggment NewUser
      */
+
     Encryption e = new Encryption();
 
     public void addNewUser() {
         int intRConfidentialInfoID = -1;
         MessageI msgI = null;
-        int intCheckedID = rgConfidential.getCheckedRadioButtonId();
+        try {
+
+            int intCheckedID = rgConfidential.getCheckedRadioButtonId();
 
 
             if (intCheckedID == rb_NConfidential.getId()) {
@@ -333,7 +397,7 @@ public class Controller {
                         , e.encrypt(etNuUserName.getText().toString())
                         , e.encrypt(etNuPassword.getText().toString())
 
-                        , 0
+                        , 2
                 );
             } else if (intCheckedID == rb_RConfidential.getId()) {
                 msgI = new MessageI(e.encrypt(etNuTitle.getText().toString())
@@ -349,13 +413,21 @@ public class Controller {
 
                         , 1
                 );
+
+            }
+            if (msgI != null) {
+
+                client.sendInsertMessage(msgI);
             }
 
-        if (msgI != null) {
-            Toast.makeText(mainActivity, "Please Select if the user receives Confidential Information", Toast.LENGTH_SHORT).show();
-        } else {
-            client.sendInsertMessage(msgI);
+        } catch (Exception ex) {
+            String err = "";
+            err = ex.getMessage();
+            err += "";
+
+            Toast.makeText(mainActivity, "Something went wrong please make sure everything is properly filled out.", Toast.LENGTH_LONG).show();
         }
+
 
     }
 
@@ -364,68 +436,213 @@ public class Controller {
         etNuFirstName.setText("");
         etNuLastName.setText("");
         strNewUserPicture = "";
-        spRole.setSelection(0);
+        spRole.setSelection(1);
         etNuUserName.setText("");
         etNuPassword.setText("");
     }
 
-    public void newPicture() {
 
-
-    }
     /**
      * UserManagement
      */
 
-    public void getAllEmployeeData(){
+    //UserManagment Controlls
+    ArrayList<User> allEmployees = new ArrayList<>();
+    EditText etUMFirstName, etUMTitle, etUMLastName, etUMPassword, etUMUserName;
+    String strUMPicture;
+    Spinner spUMRole;
+    int intUMRoleID, intUserID, intEmployeeID, intPictureID;
+    ImageButton ibUMPicture;
+    RadioGroup rgConfidentialUM;
+    RadioButton rb_RConfidentialUM, rb_NConfidentialUM;
+    User userCurrentSelectedUm;
+
+    ArrayList<String> arrRoles = new ArrayList<>();
+    //----
+
+    public void getAllEmployeeData() {
+        allEmployees =  null;
         MessageSystem msgSys = new MessageSystem("");
         msgSys.setType(MessageType.AllUser);
         client.sendSysMessage(msgSys);
+
+        populateSpinner(spUMRole, arrRoles);
     }
 
-    public void populateArrayAllUsers(User user){
-
-        allUsers.add(user);
+    public void populateArrayAllUsers(MessageUser msgU) {
+        if (allEmployees == null) {
+            allEmployees = new ArrayList<>();
+        } else {
+            allEmployees.add(messageUserToUser(msgU));
+        }
     }
 
-    public void populateUserManagementControlls(){
+    public int starFillUserManagement(int intPos) {
+        if (intPos >= allEmployees.size()) {
+            intPos = 0;
+        }
+
+        if (intPos < 0) {
+
+            intPos = 0;
+        }
+
+        userCurrentSelectedUm = allEmployees.get(intPos);
+        populateUserManagementControlls(allEmployees.get(intPos));
+        return intPos;
+    }
+
+    public void deleteEmployee() {
+
+        if (currentUser.getIntEmployeeID() == userCurrentSelectedUm.getIntEmployeeID()) {
+            alertDialogBuilder.setTitle("Trying To Delete Yourself");
+            alertDialogBuilder.setMessage("You are trying to commit forced Log out");
+            alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_YES), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    Toast.makeText(mainActivity, "You have deleted yourself and have been logged out from the system.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mainActivity, "Just kidding. Please don't delete yourself. I..I.. I need you!", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            alertDialogBuilder.setNegativeButton(resources.getText(R.string.alertD_NO), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    Toast.makeText(mainActivity, "You did not delete yourself! Great I had faith in you!", Toast.LENGTH_SHORT).show();
+                }
+            });
+            alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        } else {
+            MessageD messageD = new MessageD(userCurrentSelectedUm.getIntEmployeeID()
+                    , userCurrentSelectedUm.getIntUserID()
+                    , userCurrentSelectedUm.getIntPictureID());
+            client.sendDeleteMessage(messageD);
+
+
+            allEmployees.remove(userCurrentSelectedUm);
+        }
 
     }
 
+    public void updateEmployee() {
 
+        sendUpdateUser(userCurrentSelectedUm);
+    }
+
+
+    private void populateUserManagementControlls(User user) {
+        etUMTitle.setText(user.getStrTitle());
+        etUMFirstName.setText(user.getStrFirstname());
+        etUMLastName.setText(user.getStrLastname());
+
+        setIBNewPicture(
+                StringToBitMap(user.getStrPicture())
+                , ibUMPicture
+        );
+
+        etUMPassword.setText(user.getStrPassword());
+        etUMUserName.setText(user.getStrUserName());
+
+        if (user.getIntRoleID() == 2) {
+            spUMRole.setSelection(arrRoles.indexOf("User"));
+        } else {
+
+            spUMRole.setSelection(arrRoles.indexOf("Admin"));
+        }
+
+        if (user.getIntConfidentialID() == 1) {
+            rb_RConfidentialUM.setChecked(true);
+        } else {
+
+            rb_NConfidentialUM.setChecked(true);
+        }
+
+    }
 
 
     /**
      * General
      */
+    /**
+     * TODO ON LOGIN
+     *
+     * @param messageRoles
+     */
+
+    public void populateArrayListRoles(MessageRoles messageRoles) {
+        arrRoles.add(messageRoles.getStrRole());
+    }
+
+    public void populateSpinner(Spinner spinner, ArrayList arrayList) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(mainActivity, android.R.layout.simple_spinner_item, arrayList);
+        spinner.setAdapter(adapter);
+    }
 
     public void fillCurrentUser(MessageUser msgU) {
         try {
 
 
             if (msgU != null) {
-                currentUser = new User(msgU.getIntEmployeeID()
-                        , decryption.decrypt(msgU.getStrTitle())
-                        , decryption.decrypt(msgU.getStrFirstname())
-                        , decryption.decrypt(msgU.getStrLastname())
-
-                        , msgU.getIntPictureID()
-                        , decryption.decrypt(msgU.getStrPicture())
-
-                        , msgU.getIntRoleID()
-                        , decryption.decrypt(msgU.getStrRole())
-
-                        , msgU.getIntUserID()
-                        , decryption.decrypt(msgU.getStrUserName())
-                        , decryption.decrypt(msgU.getStrLastname())
-
-                        , msgU.getIntGetsConfidentialInfo()
-                );
+                currentUser = messageUserToUser(msgU);
             }
         } catch (Exception ex) {
             String err = ex.getMessage();
             err += "";
         }
+    }
+
+
+    private User messageUserToUser(MessageUser msgU) {
+        User user = null;
+        try {
+
+
+            user = new User(msgU.getIntEmployeeID()
+                    , decryption.decrypt(msgU.getStrTitle())
+                    , decryption.decrypt(msgU.getStrFirstname())
+                    , decryption.decrypt(msgU.getStrLastname())
+
+                    , msgU.getIntPictureID()
+                    , decryption.decrypt(msgU.getStrPicture())
+
+                    , msgU.getIntRoleID()
+                    , decryption.decrypt(msgU.getStrRole())
+
+                    , msgU.getIntUserID()
+                    , decryption.decrypt(msgU.getStrUserName())
+                    , decryption.decrypt(msgU.getStrLastname())
+
+                    , msgU.getIntConfidentialID()
+                    , msgU.getIntGetsConfidentialInfo()
+            );
+        } catch (Exception ex) {
+            String err = ex.getMessage();
+            err += "";
+        }
+        return user;
+    }
+
+
+    public void sendUpdateUser(User user) {
+        MessageU msgU = new MessageU(user.getIntEmployeeID()
+                , user.getStrTitle()
+                , user.getStrFirstname()
+                , user.getStrLastname()
+
+                , user.getIntPictureID()
+                , user.getStrPicture()
+
+                , user.getIntUserID()
+                , user.getStrUserName()
+                , user.getStrPassword()
+
+                , user.getIntRoleID()
+
+                , user.getIntConfidentialID()
+                , user.getIntGetsConfidentialInfo());
+        client.sendUpadetMessage(msgU);
+
     }
 
     private void appendText2EditText(String strAppendText, EditText etAppend) {
@@ -468,6 +685,46 @@ public class Controller {
         return formattedDate;
     }
 
+    public void setIBNewPicture(Bitmap bmNewUserPicture, ImageButton imageButton) {
+        ImageView iv = imageButton;
+        if (ibNewPicture != null && bmNewUserPicture != null) {
+            this.ibNewPicture.setImageBitmap(bmNewUserPicture);
+        }
+    }
+
+
+    public void setIBNewPicture(Bitmap bmNewUserPicture, ImageView imageView) {
+        try {
+            ImageView iv = imageView;
+            if (iv != null && bmNewUserPicture != null) {
+                iv.setImageBitmap(bmNewUserPicture);
+            }
+        } catch (Exception ex) {
+            String err = "";
+            err = ex.getMessage();
+            err += "";
+        }
+    }
+
+    public String BitMapToString(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String temp = Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
+    }
+
+    public Bitmap StringToBitMap(String encodedString) {
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
     /**
      * Setters for Controls
      */
@@ -494,6 +751,8 @@ public class Controller {
         this.tvLoginInformation = tvLoginInformation;
     }
 
+    //Profile Setter
+
     public void setEtProfileFirstName(EditText etProfileFirstName) {
         this.etProfileFirstName = etProfileFirstName;
 
@@ -509,6 +768,43 @@ public class Controller {
 
     }
 
+    public void setEtProfileRole(EditText etProfileRole) {
+        this.etProfileRole = etProfileRole;
+    }
+
+    public void setEtProfileConfidentialInfo(EditText etProfileConfidentialInfo) {
+        this.etProfileConfidentialInfo = etProfileConfidentialInfo;
+    }
+
+    public void setEtProfileUserName(EditText etProfileUserName) {
+        this.etProfileUserName = etProfileUserName;
+    }
+
+    public void setEtProfilePassword(EditText etProfilePassword) {
+        this.etProfilePassword = etProfilePassword;
+    }
+
+    public void setIvProfilePicture(ImageView ivProfilePicture) {
+        this.ivProfilePicture = ivProfilePicture;
+    }
+
+    public void setBtnProfileUpdate(Button btnProfileUpdate) {
+        this.btnProfileUpdate = btnProfileUpdate;
+    }
+
+    public void setRgProfile(RadioGroup rgProfile) {
+        this.rgProfile = rgProfile;
+    }
+
+    public void setRb_RConfidentalProfile(RadioButton rb_RConfidentalProfile) {
+        this.rb_RConfidentalProfile = rb_RConfidentalProfile;
+    }
+
+    public void setRb_NConfidentalProfile(RadioButton rb_NConfidentalProfile) {
+        this.rb_NConfidentalProfile = rb_NConfidentalProfile;
+    }
+
+    // New User Setters
     public void setEtNuFirstName(EditText etNuFirstName) {
         this.etNuFirstName = etNuFirstName;
     }
@@ -546,11 +842,6 @@ public class Controller {
         this.strNewUserPicture = strNewUserPicture;
     }
 
-    public void setIBNewPicture(Bitmap bmNewUserPicture) {
-        if (ibNewPicture != null && bmNewUserPicture != null) {
-            this.ibNewPicture.setImageBitmap(bmNewUserPicture);
-        }
-    }
 
     public void setIntNuRoleID(int intNuRoleID) {
         this.intNuRoleID = intNuRoleID;
@@ -571,6 +862,8 @@ public class Controller {
     public void setEtUMFirstName(EditText etUMFirstName) {
         this.etUMFirstName = etUMFirstName;
     }
+
+    //User Management Setters
 
     public void setEtUMTitle(EditText etUMTitle) {
         this.etUMTitle = etUMTitle;
@@ -615,4 +908,6 @@ public class Controller {
     public void setRb_NConfidentialUM(RadioButton rb_NConfidentialUM) {
         this.rb_NConfidentialUM = rb_NConfidentialUM;
     }
+
+
 }

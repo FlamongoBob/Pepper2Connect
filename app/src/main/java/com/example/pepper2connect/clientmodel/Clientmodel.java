@@ -96,6 +96,14 @@ public class Clientmodel {
                             }else if (msg.getType().equals(MessageType.Suc_IUD)) {
 
                                 controller.showInformation((MessageSystem) msg);
+
+                            }else if (msg.getType().equals(MessageType.AllUser)) {
+
+                                controller.populateArrayAllUsers((MessageUser) msg);
+
+                            }else if (msg.getType().equals(MessageType.Roles)) {
+
+                                controller.populateArrayListRoles((MessageRoles) msg);
                             }
                         }
 

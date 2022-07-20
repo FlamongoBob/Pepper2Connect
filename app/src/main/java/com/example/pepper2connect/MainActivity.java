@@ -24,10 +24,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.pepper2connect.controller.Controller;
@@ -135,8 +135,7 @@ public class MainActivity extends AppCompatActivity {
                                     initiateProfileControls();
                                 }
 
-                                controller.fillProfile(frgProfile);
-                                frgProfile.setFragment_newUser(fragment_newUser);
+                                controller.fillProfile();
 
                                 return true;
                             } else {
@@ -247,21 +246,55 @@ public class MainActivity extends AppCompatActivity {
 
     public void initiateProfileControls() {
         try {
+
+
+            ImageView ivProfilePicture = findViewById(R.id.ivProfilePicture);
+            ivProfilePicture.setFocusable(false);
+            controller.setIvProfilePicture(ivProfilePicture);
+
             EditText etProfileTitle = findViewById(R.id.etProfileTitle);
-            etProfileTitle.setKeyListener(null);
-            etProfileTitle.setFocusable(false);
+            //etProfileTitle.setKeyListener(null);
+            //etProfileTitle.setFocusable(false);
             controller.setEtProfileTitle(etProfileTitle);
 
             EditText etProfileFirstName = findViewById(R.id.etProfileFirstName);
-            etProfileFirstName.setKeyListener(null);
-            etProfileFirstName.setFocusable(false);
+            //etProfileFirstName.setKeyListener(null);
+           //etProfileFirstName.setFocusable(false);
             controller.setEtProfileFirstName(etProfileFirstName);
 
             EditText etProfileLastName = findViewById(R.id.etProfileLastName);
-            etProfileLastName.setKeyListener(null);
-            etProfileFirstName.setFocusable(false);
+            //etProfileLastName.setKeyListener(null);
+            //etProfileLastName.setFocusable(false);
             controller.setEtProfileLastName(etProfileLastName);
 
+            EditText etProfileRole = findViewById(R.id.etProfileRole);
+            etProfileRole.setKeyListener(null);
+            etProfileRole.setFocusable(false);
+            controller.setEtProfileRole(etProfileRole);
+
+
+            EditText etProfileUserName = findViewById(R.id.etProfileUserName);
+            etProfileUserName.setKeyListener(null);
+            etProfileUserName.setFocusable(false);
+            controller.setEtProfileUserName(etProfileUserName);
+
+            EditText etProfilePassword = findViewById(R.id.etProfilePassword);
+            //etProfilePassword.setKeyListener(null);
+            //etProfilePassword.setFocusable(false);
+            controller.setEtProfilePassword(etProfilePassword);
+
+            RadioButton rb_NConfidentalProfile = findViewById(R.id.rb_NConfidentalProfile);
+            rb_NConfidentalProfile.setKeyListener(null);
+            rb_NConfidentalProfile.setFocusable(false);
+            controller.setRb_NConfidentalProfile(rb_NConfidentalProfile);
+
+            RadioButton rb_RConfidentalProfile = findViewById(R.id.rb_RConfidentalProfile);
+            rb_RConfidentalProfile.setKeyListener(null);
+            rb_RConfidentalProfile.setFocusable(false);
+            controller.setRb_RConfidentalProfile(rb_RConfidentalProfile);
+
+            Button btnProfileUpdate = findViewById(R.id.btnProfileUpdate);
+            btnProfileUpdate.setOnClickListener(view -> controller.updateProfile());
 
             isCreatedProfile = true;
         } catch (Exception ex) {
@@ -392,9 +425,10 @@ public class MainActivity extends AppCompatActivity {
                             Bundle extras = data.getExtras();
                             Bitmap selectedImage = (Bitmap) extras.get("data");
 
-                            controller.setStrNewUserPicture(selectedImage.toString());
+                            controller.setStrNewUserPicture(controller.BitMapToString(selectedImage));
 
-                            controller.setIBNewPicture((Bitmap) data.getExtras().get("data"));
+                            controller.setIBNewPicture((Bitmap) data.getExtras().get("data"), findViewById(R.id.ibNewPicture));
+
 
                         } catch (Exception ex) {
                             String err = "";
@@ -416,9 +450,11 @@ public class MainActivity extends AppCompatActivity {
                                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                                     String picturePath = cursor.getString(columnIndex);
 
-                                    controller.setStrNewUserPicture(selectedImage.toString());
+                                    Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
 
-                                    controller.setIBNewPicture(BitmapFactory.decodeFile(picturePath));
+                                    controller.setStrNewUserPicture(controller.BitMapToString(bitmap));
+
+                                    controller.setIBNewPicture(bitmap, findViewById(R.id.ibNewPicture));
                                     cursor.close();
                                 }
                             }

@@ -19,6 +19,7 @@ public class MessageUser extends Message {
     private String strUserName;
     private String strPassword;
 
+    private int intConfidentialID;
     private int intGetsConfidentialInfo;
 
 
@@ -37,6 +38,7 @@ public class MessageUser extends Message {
             , String strUserName
             , String strPassword
 
+            , int intConfidentialID
             , int intGetsConfidentialInfo) {
 
         super(MessageType.User);
@@ -56,6 +58,7 @@ public class MessageUser extends Message {
         this.strUserName = strUserName;
         this.strPassword = strPassword;
 
+        this.intConfidentialID = intConfidentialID;
         this.intGetsConfidentialInfo = intGetsConfidentialInfo;
 
 
@@ -78,8 +81,9 @@ public class MessageUser extends Message {
 
                 '|' + intUserID +
                 '|' + strUserName +
-                '|' + strPassword
-                +
+                '|' + strPassword +
+
+                '|' + intConfidentialID+
                 '|' + intGetsConfidentialInfo;
     }
 
@@ -129,5 +133,9 @@ public class MessageUser extends Message {
 
     public int getIntGetsConfidentialInfo() {
         return intGetsConfidentialInfo;
+    }
+
+    public int getIntConfidentialID() {
+        return intConfidentialID;
     }
 }

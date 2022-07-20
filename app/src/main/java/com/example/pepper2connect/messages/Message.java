@@ -67,34 +67,48 @@ public abstract class Message {
                 String[] parts = strDecryptedMessage.split("\\|");
 
                 if (parts[0].equals(MessageType.Disconnect.toString())) {
-                    message = new MessageSystem(parts[1]);
+                    message = new MessageSystem(
+                            parts[1]
+                    );
                     message.setType(MessageType.Disconnect);
 
                 } else if (parts[0].equals(MessageType.Unsuccessful_LogIn.toString())) {
-                    message = new MessageSystem(parts[1]);
+                    message = new MessageSystem(
+                            parts[1]
+                    );
                     message.setType(MessageType.Unsuccessful_LogIn);
 
                 } else if (parts[0].equals(MessageType.Successful_LogIn.toString())) {
-                    message = new MessageSystem(parts[1]);
+                    message = new MessageSystem(
+                            parts[1]
+                    );
                     message.setType(MessageType.Successful_LogIn);
 
                 }else if (parts[0].equals(MessageType.LogOut.toString())) {
                     message.setType(MessageType.LogOut);
 
                 } else if (parts[0].equals(MessageType.Disconnect.toString())) {
-                    message = new MessageSystem(parts[1]);
+                    message = new MessageSystem(
+                            parts[1]
+                    );
                     message.setType(MessageType.Disconnect);
 
                 } else if (parts[0].equals(MessageType.Patient.toString())) {
-                    message = new MessageSystem(parts[1]);
+                    message = new MessageSystem(
+                            parts[1]
+                    );
                     message.setType(MessageType.Patient);
 
                 } else if (parts[0].equals(MessageType.System.toString())) {
-                    message = new MessageSystem(parts[1]);
+                    message = new MessageSystem(
+                            parts[1]
+                    );
                     message.setType(MessageType.System);
 
                 } else if (parts[0].equals(MessageType.Test.toString())) {
-                    message = new MessageSystem(parts[1]);
+                    message = new MessageSystem(
+                            parts[1]
+                    );
                     message.setType(MessageType.Test);
 
                 } else if (parts[0].equals(MessageType.User.toString())) {
@@ -114,14 +128,46 @@ public abstract class Message {
                             ,parts[11]
 
                             ,Integer.parseInt(parts[12])
+                            ,Integer.parseInt(parts[13])
                     );
                     message.setType(MessageType.User);
+                } else if (parts[0].equals(MessageType.AllUser.toString())) {
+                    message = new MessageUser(Integer.parseInt(parts[1])
+                            ,parts[2]
+                            ,parts[3]
+                            ,parts[4]
+
+                            ,Integer.parseInt(parts[5])
+                            ,parts[6]
+
+                            ,Integer.parseInt(parts[7])
+                            ,parts[8]
+
+                            ,Integer.parseInt(parts[9])
+                            ,parts[10]
+                            ,parts[11]
+
+                            ,Integer.parseInt(parts[12])
+                            ,Integer.parseInt(parts[13])
+                    );
+                    message.setType(MessageType.AllUser);
                 } else if (parts[0].equals(MessageType.Suc_IUD.toString())) {
-                    message = new MessageSystem(parts[1]);
+                    message = new MessageSystem(
+                            parts[1]
+                    );
                     message.setType(MessageType.Suc_IUD);
                 } else if (parts[0].equals(MessageType.Error.toString())) {
-                    message = new MessageSystem(parts[1]);
+                    message = new MessageSystem(
+                            parts[1]
+                    );
                     message.setType(MessageType.Error);
+
+                }else if (parts[0].equals(MessageType.Roles.toString())) {
+                    message = new MessageRoles(
+                            Integer.parseInt(parts[1])
+                            ,parts[2]
+                    );
+                    message.setType(MessageType.Roles);
                 }
             }
         } catch (IOException e) {

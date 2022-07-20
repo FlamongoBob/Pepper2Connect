@@ -28,10 +28,8 @@ public class Fragment_Profile extends Fragment {
     MainActivity mainActivity;
     Controller controller;
 
-    Resources resources = Resources.getSystem();
-    FragmentManager frgMng_Profile;
-    Fragment activeFragment_frgMngProfile;
-    Fragment_NewUser fragment_newUser;// = new Fragment_NewUser();
+    int intPos = -1;
+
     private boolean isCreatedNewUser = false;
     private boolean isCreatedUserManagement = false;
 
@@ -111,6 +109,10 @@ public class Fragment_Profile extends Fragment {
                         if (!isCreatedUserManagement) {
                             initiateUserManagementControls();
                         }
+
+                        controller.getAllEmployeeData();
+
+                        intPos = controller.starFillUserManagement(0);
                         return true;
                     }
                     return false;
@@ -172,6 +174,7 @@ public class Fragment_Profile extends Fragment {
 
         ImageButton ibNewPicture = mainActivity.findViewById(R.id.ibNewPicture);
         controller.setIBNewPicture(ibNewPicture);
+
         ibNewPicture.setOnClickListener(view -> {
             if (mainActivity.checkAndRequestPermissions(mainActivity)) {
                 mainActivity.chooseImage(mainActivity);
@@ -196,30 +199,30 @@ public class Fragment_Profile extends Fragment {
         Spinner spUMRole = mainActivity.findViewById(R.id.spUMRole);
          controller.setSpUMRole(spUMRole);
 
+
         Button btnUMSaveChanges = mainActivity.findViewById(R.id.btnUMSaveChanges);
         btnUMSaveChanges.setOnClickListener(view -> {
-            //controller.addNewUser();
+            controller.updateEmployee();
         });
 
         Button btnUMDeleteUser = mainActivity.findViewById(R.id.btnUMDeleteUser);
         btnUMDeleteUser.setOnClickListener(view -> {
-            // controller.clearNewUser();
+            controller.deleteEmployee();
         });
 
         Button btnUMPrevious = mainActivity.findViewById(R.id.btnUMPrevious);
         btnUMPrevious.setOnClickListener(view -> {
-            // controller.clearNewUser();
+            intPos = intPos-1;
+           controller.starFillUserManagement(intPos);
         });
 
         Button btnUMNext = mainActivity.findViewById(R.id.btnUMNext);
         btnUMNext.setOnClickListener(view -> {
-            // controller.clearNewUser();
+            intPos = intPos+1;
+            controller.starFillUserManagement(intPos);
         });
 
     }
 
 
-    public void setFragment_newUser(Fragment_NewUser fragment_newUser) {
-        this.fragment_newUser = fragment_newUser;
-    }
 }
