@@ -127,11 +127,11 @@ public class Clientmodel {
                  * @param msgConnect with Boolean false --> Trying to Connect, message to User
                  *                   with Boolean True -->  Connected to Server,  message to User
                  */
-                MessageSystem msgSys = new MessageSystem("Connecting");
-                msgSys.setType(MessageType.Connect);
+               // MessageSystem msgSys = new MessageSystem("Connecting");
+                //msgSys.setType(MessageType.Connect);
                 //msgSys.setBoolean(false);
 
-                listener.onProcessed(msgSys);
+                //listener.onProcessed(msgSys);
 
                 try {
                     if (socket != null) {

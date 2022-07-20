@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface arg0, int arg1) {
                                     Toast.makeText(MainActivity.this, resources.getText(R.string.Yes_Log_Out_Text), Toast.LENGTH_LONG).show();
                                     controller.clientLogOut();
+                                    frgMng.beginTransaction().hide(activeFragment).show(frgLogin).commit();
                                 }
                             });
                             alertDialogBuilder.setNegativeButton(resources.getText(R.string.alertD_NO), new DialogInterface.OnClickListener() {

@@ -289,7 +289,7 @@ public class Controller {
             if (currentUser.getIntConfidentialID() == 1) {
                 rb_RConfidentalProfile.setChecked(true);
             } else {
-                rb_RConfidentalProfile.setChecked(true);
+                rb_NConfidentalProfile.setChecked(true);
             }
 
         }
@@ -303,26 +303,6 @@ public class Controller {
             currentUser.setStrLastname(etProfileLastName.getText().toString());
             currentUser.setStrPassword(etProfilePassword.getText().toString());
 
-                      /*
-            User newUser = new User(currentUser.getIntEmployeeID()
-                    , currentUser.getStrTitle()
-                    , currentUser.getStrFirstname()
-                    , currentUser.getStrLastname()
-
-                    , currentUser.getIntPictureID()
-                    , currentUser.getStrPicture()
-
-                    , currentUser.getIntRoleID()
-                    , currentUser.getStrRole()
-
-                    , currentUser.getIntUserID()
-                    , currentUser.getStrUserName()
-                    , currentUser.getStrPassword()
-
-                    , currentUser.getIntConfidentialID()
-                    , currentUser.getIntGetsConfidentialInfo()
-            );
-            */
             sendUpdateUser(currentUser);
 
         } catch (Exception ex) {
@@ -581,8 +561,6 @@ public class Controller {
 
     public void fillCurrentUser(MessageUser msgU) {
         try {
-
-
             if (msgU != null) {
                 currentUser = messageUserToUser(msgU);
             }
@@ -626,22 +604,22 @@ public class Controller {
 
     public void sendUpdateUser(User user) {
         MessageU msgU = new MessageU(user.getIntEmployeeID()
-                , user.getStrTitle()
-                , user.getStrFirstname()
-                , user.getStrLastname()
+                , e.encrypt(user.getStrTitle())
+                , e.encrypt(user.getStrFirstname())
+                , e.encrypt(user.getStrLastname())
 
                 , user.getIntPictureID()
-                , user.getStrPicture()
+                , e.encrypt(user.getStrPicture())
 
                 , user.getIntUserID()
-                , user.getStrUserName()
-                , user.getStrPassword()
+                , e.encrypt(user.getStrUserName())
+                , e.encrypt(user.getStrPassword())
 
                 , user.getIntRoleID()
 
                 , user.getIntConfidentialID()
                 , user.getIntGetsConfidentialInfo());
-        client.sendUpadetMessage(msgU);
+        client.sendUpdateMessage(msgU);
 
     }
 

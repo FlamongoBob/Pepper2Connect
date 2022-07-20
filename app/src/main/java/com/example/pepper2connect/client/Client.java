@@ -48,7 +48,7 @@ public class Client {
 
         cModel.sendMessage(messageSystem);
     }
-    public void sendUpadetMessage(MessageU msgU) {
+    public void sendUpdateMessage(MessageU msgU) {
 
         cModel.sendMessage(msgU);
     }
