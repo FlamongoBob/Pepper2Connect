@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import com.example.pepper2connect.controller.Controller;
@@ -34,8 +36,6 @@ public class Fragment_Profile extends Fragment {
     private boolean isCreatedUserManagement = false;
 
 
-    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
-
     public Fragment_Profile(MainActivity mainActivity, Controller controller) {
         // Required empty public constructor
         this.mainActivity = mainActivity;
@@ -52,9 +52,11 @@ public class Fragment_Profile extends Fragment {
     public View onCreateView(LayoutInflater inflater
             , ViewGroup container
             , Bundle savedInstanceState) {
+        View vRoots = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        initiateProfileControls(vRoots);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        return vRoots;
     }
 
     @Override
@@ -63,10 +65,9 @@ public class Fragment_Profile extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // Toast.makeText(mainActivity, resources.getText(R.string.last_message_rec_Text), Toast.LENGTH_SHORT).show();
+        // Toast.makeText(mainActivity, mainActivity.getText(R.string.last_message_rec_Text), Toast.LENGTH_SHORT).show();
 
       /*  if (activeFragment == null) {
             activeFragment = mainActivity.getActiveFragment();
@@ -85,12 +86,6 @@ public class Fragment_Profile extends Fragment {
                     if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgNewUser").getTag())) {
                         mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_newUser).commit();
                         mainActivity.activeFragment = mainActivity.fragment_newUser;
-                        //mainActivity.setActiveFragment(activeFragment);// = fragment_newUser;
-                        // mainActivity.setFrgMng(frgMng);
-
-                        if (!isCreatedNewUser) {
-                            initiateNewUserControls();
-                        }
                         return true;
                     }
 
@@ -105,10 +100,6 @@ public class Fragment_Profile extends Fragment {
                     if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgUserManagement").getTag())) {
                         mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_userManagement).commit();
                         mainActivity.activeFragment = mainActivity.fragment_userManagement;
-
-                        if (!isCreatedUserManagement) {
-                            initiateUserManagementControls();
-                        }
 
                         controller.getAllEmployeeData();
 
@@ -126,103 +117,65 @@ public class Fragment_Profile extends Fragment {
         }
     }
 
-    private void initiateNewUserControls() {
-        ImageButton ibNewPicture = mainActivity.findViewById(R.id.ibNewPicture);
-        controller.setIBNewPicture(ibNewPicture);
-        ibNewPicture.setOnClickListener(view -> {
-            if (mainActivity.checkAndRequestPermissions(mainActivity)) {
-                mainActivity.chooseImage(mainActivity);
-            }
-        });
+    public void initiateProfileControls(View vRoot) {
+        try {
+            ImageView ivProfilePicture = vRoot.findViewById(R.id.ivProfilePicture);
+            ivProfilePicture.setFocusable(false);
+            controller.setIvProfilePicture(ivProfilePicture);
 
-        EditText etNuFirstName = mainActivity.findViewById(R.id.etNuFirstName);
-        controller.setEtNuFirstName(etNuFirstName);
+            EditText etProfileTitle = vRoot.findViewById(R.id.etProfileTitle);
+            //etProfileTitle.setKeyListener(null);
+            //etProfileTitle.setFocusable(false);
+            controller.setEtProfileTitle(etProfileTitle);
 
-        EditText etNuLastName = mainActivity.findViewById(R.id.etNuLastName);
-        controller.setEtNuLastName(etNuLastName);
+            EditText etProfileFirstName = vRoot.findViewById(R.id.etProfileFirstName);
+            //etProfileFirstName.setKeyListener(null);
+            //etProfileFirstName.setFocusable(false);
+            controller.setEtProfileFirstName(etProfileFirstName);
 
-        EditText etNuPassword = mainActivity.findViewById(R.id.etNuPassword);
-        controller.setEtNuPassword(etNuPassword);
+            EditText etProfileLastName = vRoot.findViewById(R.id.etProfileLastName);
+            //etProfileLastName.setKeyListener(null);
+            //etProfileLastName.setFocusable(false);
+            controller.setEtProfileLastName(etProfileLastName);
 
-        EditText etNuUserName = mainActivity.findViewById(R.id.etNuUserName);
-        controller.setEtNuUserName(etNuUserName);
+            EditText etProfileRole = vRoot.findViewById(R.id.etProfileRole);
+            etProfileRole.setKeyListener(null);
+            etProfileRole.setFocusable(false);
+            controller.setEtProfileRole(etProfileRole);
 
-        EditText etNuTitle = mainActivity.findViewById(R.id.etNuTitle);
-        controller.setEtNuTitle(etNuTitle);
 
-        Spinner spNuRole = mainActivity.findViewById(R.id.spNuRole);
-        controller.setSpRole(spNuRole);
+            EditText etProfileUserName = vRoot.findViewById(R.id.etProfileUserName);
+            etProfileUserName.setKeyListener(null);
+            etProfileUserName.setFocusable(false);
+            controller.setEtProfileUserName(etProfileUserName);
 
-        Button btnAddNewUser = mainActivity.findViewById(R.id.btnAddNewUser);
-        btnAddNewUser.setOnClickListener(view -> {
-            controller.addNewUser();
-        });
+            EditText etProfilePassword = vRoot.findViewById(R.id.etProfilePassword);
+            //etProfilePassword.setKeyListener(null);
+            //etProfilePassword.setFocusable(false);
+            controller.setEtProfilePassword(etProfilePassword);
 
-        Button btnNewUserClear = mainActivity.findViewById(R.id.btnNewUserClear);
-        btnNewUserClear.setOnClickListener(view -> {
-            controller.clearNewUser();
-        });
+            RadioButton rb_NConfidentalProfile = vRoot.findViewById(R.id.rb_NConfidentalProfile);
+            rb_NConfidentalProfile.setKeyListener(null);
+            rb_NConfidentalProfile.setFocusable(false);
+            controller.setRb_NConfidentalProfile(rb_NConfidentalProfile);
 
+            RadioButton rb_RConfidentalProfile = vRoot.findViewById(R.id.rb_RConfidentalProfile);
+            rb_RConfidentalProfile.setKeyListener(null);
+            rb_RConfidentalProfile.setFocusable(false);
+            controller.setRb_RConfidentalProfile(rb_RConfidentalProfile);
+
+            Button btnProfileUpdate = vRoot.findViewById(R.id.btnProfileUpdate);
+            btnProfileUpdate.setOnClickListener(view -> controller.updateProfile());
+
+            //isCreatedProfile = true;
+        } catch (Exception ex) {
+            String err = "";
+            err = ex.getMessage();
+            //isCreatedProfile = false;
+        }
     }
 
-    /**
-     * TODO MESSAGE GET ALL EMPLOYEES
-     */
 
-    private void initiateUserManagementControls() {
-
-
-        ImageButton ibNewPicture = mainActivity.findViewById(R.id.ibNewPicture);
-        controller.setIBNewPicture(ibNewPicture);
-
-        ibNewPicture.setOnClickListener(view -> {
-            if (mainActivity.checkAndRequestPermissions(mainActivity)) {
-                mainActivity.chooseImage(mainActivity);
-            }
-        });
-
-        EditText etUMFirstName = mainActivity.findViewById(R.id.etUMFirstName);
-        controller.setEtUMFirstName(etUMFirstName);
-
-        EditText etUMLastName = mainActivity.findViewById(R.id.etUMLastName);
-        controller.setEtUMLastName(etUMLastName);
-
-        EditText etUMPassword = mainActivity.findViewById(R.id.etUMPassword);
-        controller.setEtUMPassword(etUMPassword);
-
-        EditText etUMUserName = mainActivity.findViewById(R.id.etUMUserName);
-         controller.setEtUMUserName(etUMUserName);
-
-        EditText etUMTitle = mainActivity.findViewById(R.id.etUMTitle);
-         controller.setEtUMTitle(etUMTitle);
-
-        Spinner spUMRole = mainActivity.findViewById(R.id.spUMRole);
-         controller.setSpUMRole(spUMRole);
-
-
-        Button btnUMSaveChanges = mainActivity.findViewById(R.id.btnUMSaveChanges);
-        btnUMSaveChanges.setOnClickListener(view -> {
-            controller.updateEmployee();
-        });
-
-        Button btnUMDeleteUser = mainActivity.findViewById(R.id.btnUMDeleteUser);
-        btnUMDeleteUser.setOnClickListener(view -> {
-            controller.deleteEmployee();
-        });
-
-        Button btnUMPrevious = mainActivity.findViewById(R.id.btnUMPrevious);
-        btnUMPrevious.setOnClickListener(view -> {
-            intPos = intPos-1;
-           controller.starFillUserManagement(intPos);
-        });
-
-        Button btnUMNext = mainActivity.findViewById(R.id.btnUMNext);
-        btnUMNext.setOnClickListener(view -> {
-            intPos = intPos+1;
-            controller.starFillUserManagement(intPos);
-        });
-
-    }
 
 
 }

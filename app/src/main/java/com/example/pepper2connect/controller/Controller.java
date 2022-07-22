@@ -21,6 +21,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.example.pepper2connect.Crypto.Decryption;
 import com.example.pepper2connect.Crypto.Encryption;
+import com.example.pepper2connect.Fragment_Login;
 import com.example.pepper2connect.MainActivity;
 import com.example.pepper2connect.Model.User;
 import com.example.pepper2connect.R;
@@ -42,18 +43,18 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Controller {
-    // public static volatile Boolean isClientConnected = false;
-    // public static volatile Boolean isLoggedIn = false;
+    public static volatile Boolean isClientConnected = false;
+    public static volatile Boolean isLoggedIn = false;
     /**
      * TODO COMMENT isClientConnected, isLoggedIn
      */
-    public static volatile Boolean isClientConnected = true;
-    public static volatile Boolean isLoggedIn = true;
+    //public static volatile Boolean isClientConnected = true;
+    //public static volatile Boolean isLoggedIn = true;
     private Client client;
     Resources resources = Resources.getSystem();
 
-    final private String strServerIP = "127.10.10.15";
-    final private int intPort = 10284;
+    final private String strServerIP ="10.0.2.2";// = "127.10.10.15";
+    final private int intPort = 8888; //= 10284;
     Decryption decryption = new Decryption();
 
     private User currentUser;
@@ -74,13 +75,13 @@ public class Controller {
     Spinner spRole;
     int intNuRoleID, intNuTitleID;
     ImageButton ibNewPicture;
-    RadioGroup rgConfidential;
-    RadioButton rb_RConfidential, rb_NConfidential;
+    RadioGroup rg_Nu_Confidential;
+    RadioButton rb_Nu_RConfidentalInfo, rb_Nu_NConfidentalInfo;
     //----
 
 
     private AlertDialog.Builder alertDialogBuilder;
-    private AlertDialog alertDialog;
+   // private AlertDialog alertDialog;
 
     private String strBufferPatientInfo = "", strBufferLogServerCon = "";
 
@@ -98,7 +99,13 @@ public class Controller {
 
                             try {
                                 currentUser = null;
-                                client = new Client(this.strServerIP, this.intPort, strUsername, strPassword, this);
+
+                                client = new Client(this.strServerIP
+                                        , this.intPort
+                                        , e.encrypt(strUsername)
+                                        , e.encrypt(strPassword)
+                                        , this);
+
                             } catch (Exception ex) {
                                 String err = "";
                                 err = ex.getMessage();
@@ -125,7 +132,7 @@ public class Controller {
         if (client != null && isClientConnected && isLoggedIn) {
             showInformation(msgSys);
 
-            appendLogServerCon(msgSys);
+            appendLogServerCon(msgSys.getType());
             client.disconnect();
         }
     }
@@ -133,73 +140,85 @@ public class Controller {
     public void showInformation(Message msgSys) {
         String strMessage;
         if (tvLoginInformation != null) {
-            switch (msgSys.getType()) {
-                case LogOut:
-                    alertDialogBuilder.setTitle(resources.getText(R.string.Logged_Out_Title));
-                    alertDialogBuilder.setMessage(resources.getText(R.string.Logged_Out_Text));
-                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface arg0, int arg1) {
-                        }
-                    });
+            try {
+                alertDialogBuilder = new AlertDialog.Builder(mainActivity);
 
-                    tvLoginInformation.setText(resources.getText(R.string.Logged_Out_Text));
-                    tvLoginInformation.setTextColor(Color.parseColor("#FF000000"));
-                    break;
-                case Unsuccessful_LogIn:
-                    alertDialogBuilder.setTitle(resources.getText(R.string.UnSuc_Login_Title));
-                    alertDialogBuilder.setMessage(resources.getText(R.string.UnSuc_Login_Text));
-                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface arg0, int arg1) {
-                        }
-                    });
-                    tvLoginInformation.setText(resources.getText(R.string.UnSuc_Login_Text));
-                    tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
-                    break;
-                case Successful_LogIn:
-                    alertDialogBuilder.setTitle(resources.getText(R.string.Suc_Login_Title));
-                    alertDialogBuilder.setMessage(resources.getText(R.string.Suc_Login_Text));
-                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface arg0, int arg1) {
-                        }
-                    });
-                    tvLoginInformation.setText("You have successfully Logged in!.");
-                    tvLoginInformation.setTextColor(Color.parseColor("#00B612"));
-                    break;
-                case Error:
+                switch (msgSys.getType()) {
+                    case LogOut:
+                        alertDialogBuilder.setTitle(mainActivity.getText(R.string.Logged_Out_Title));
+                        alertDialogBuilder.setMessage(mainActivity.getText(R.string.Logged_Out_Text));
+                        alertDialogBuilder.setPositiveButton(mainActivity.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+                            }
+                        });
 
-                    strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
-                    alertDialogBuilder.setTitle(resources.getText(R.string.Error_Title));
-                    alertDialogBuilder.setMessage(resources.getText(R.string.Error_Text) + strMessage);
-                    alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface arg0, int arg1) {
-                        }
-                    });
-                    tvLoginInformation.setText(resources.getText(R.string.Error_Text) + strMessage);
-                    tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
-                    break;
-                case Suc_IUD:
+                        tvLoginInformation.setText(mainActivity.getText(R.string.Logged_Out_Text));
+                        tvLoginInformation.setTextColor(Color.parseColor("#FF000000"));
+                        break;
+                    case Unsuccessful_LogIn:
+                        alertDialogBuilder.setTitle(mainActivity.getText(R.string.UnSuc_Login_Title));
+                        alertDialogBuilder.setMessage(mainActivity.getText(R.string.UnSuc_Login_Text));
+                        alertDialogBuilder.setPositiveButton(mainActivity.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+                            }
+                        });
+                        tvLoginInformation.setText(mainActivity.getText(R.string.UnSuc_Login_Text));
+                        tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
+                        break;
+                    case Successful_LogIn:
 
-                    strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
-                    alertDialogBuilder.setTitle(resources.getText(R.string.Suc_IUD_Title));
-                    alertDialogBuilder.setMessage(resources.getText(R.string.Suc_IUD_Text) + strMessage);
+                        alertDialogBuilder.setMessage(mainActivity.getText(R.string.Suc_Login_Text));
+                        alertDialogBuilder.setTitle(String.valueOf(mainActivity.getText(R.string.Suc_Login_Title)));
+                        alertDialogBuilder.setPositiveButton(mainActivity.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+                            }
+                        });
 
-                    etNuTitle.setText("");
-                    etNuFirstName.setText("");
-                    etNuLastName.setText("");
-                    strNewUserPicture = "";
-                    spRole.setSelection(0);
-                    etNuUserName.setText("");
-                    etNuPassword.setText("");
 
-                    break;
+                        tvLoginInformation.setText(mainActivity.getText(R.string.Suc_Login_Text));
+                        tvLoginInformation.setTextColor(Color.parseColor("#00B612"));
+                        break;
+                    case Error:
 
+                        strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
+                        alertDialogBuilder.setTitle(mainActivity.getText(R.string.Error_Title));
+                        alertDialogBuilder.setMessage(mainActivity.getText(R.string.Error_Text) + strMessage);
+                        alertDialogBuilder.setPositiveButton(mainActivity.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+                            }
+                        });
+                        tvLoginInformation.setText(mainActivity.getText(R.string.Error_Text) + strMessage);
+                        tvLoginInformation.setTextColor(Color.parseColor("#b50000"));
+                        break;
+                    case Suc_IUD:
+
+                        strMessage = ((MessageSystem) msgSys).getStrSystemNotification();
+                        alertDialogBuilder.setTitle(mainActivity.getText(R.string.Suc_IUD_Title));
+                        alertDialogBuilder.setMessage(mainActivity.getText(R.string.Suc_IUD_Text) + strMessage);
+
+                        etNuTitle.setText("");
+                        etNuFirstName.setText("");
+                        etNuLastName.setText("");
+                        strNewUserPicture = "";
+                        spRole.setSelection(0);
+                        etNuUserName.setText("");
+                        etNuPassword.setText("");
+
+                        break;
+
+                }
+               AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+
+            }catch(Exception ex){
+                String err ="";
+                err = ex.getMessage();
+                err+="";
             }
-            alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
 
         }
     }
@@ -208,9 +227,7 @@ public class Controller {
      * Fragment_Server
      */
 
-    /**
-     * TODO decomment sendSysMessage
-     */
+
     public void clientLogOut() {
         if (isClientConnected) {
             MessageSystem msgSysTest = new MessageSystem("");
@@ -220,9 +237,6 @@ public class Controller {
         }
     }
 
-    /**
-     * TODO decomment sendSysMessage
-     */
     public void testServerConnection() {
         if (isClientConnected) {
             MessageSystem msgSysTest = new MessageSystem("");
@@ -232,10 +246,10 @@ public class Controller {
         }
     }
 
-    public void appendLogServerCon(MessageSystem messageSystem) {
+    public void appendLogServerCon(MessageType msgType) {
 
         String strAppendString = "";
-        strAppendString += "Last Message Type received: \n" + messageSystem.getType().toString();
+        strAppendString += "Last Message Type received: \n " + msgType.toString();
 
         if (etLogServerCon != null) {
             appendText2EditText(strAppendString, etLogServerCon);
@@ -265,7 +279,7 @@ public class Controller {
      */
 
     //Profile Controlls
-    EditText etProfileLastName, etProfileTitle, etProfileFirstName, etProfileRole, etProfileConfidentialInfo, etProfileUserName, etProfilePassword;
+    EditText etProfileLastName, etProfileTitle, etProfileFirstName, etProfileRole,  etProfileUserName, etProfilePassword;
     ImageView ivProfilePicture;
     Button btnProfileUpdate;
     RadioGroup rgProfile;
@@ -273,18 +287,26 @@ public class Controller {
 
     public void fillProfile() {
         if (currentUser != null && etProfileTitle != null && etProfileFirstName != null && etProfileLastName != null
-                && etProfileRole != null && etProfileConfidentialInfo != null && etProfileUserName != null && etProfilePassword != null
+                && etProfileRole != null && etProfileUserName != null && etProfilePassword != null
                 && rb_RConfidentalProfile != null && rb_NConfidentalProfile != null
         ) {
-            setIBNewPicture(StringToBitMap(currentUser.getStrPicture()), ivProfilePicture);
+            String strPicture = currentUser.getStrPicture();
+            if(!strPicture.substring(0,6).equals("NoPicture")) {
+
+                Bitmap bmPicture = StringToBitMap(strPicture);
+                if (bmPicture != null) {
+                    setIBNewPicture(bmPicture, ivProfilePicture);
+                }
+            }
 
             etProfileTitle.setText(currentUser.getStrTitle());
             etProfileFirstName.setText(currentUser.getStrFirstname());
             etProfileLastName.setText(currentUser.getStrLastname());
+
             etProfileUserName.setText(currentUser.getStrUserName());
             etProfilePassword.setText(currentUser.getStrPassword());
+
             etProfileRole.setText(currentUser.getStrRole());
-            etProfileConfidentialInfo.setText(currentUser.getStrFirstname());
 
             if (currentUser.getIntConfidentialID() == 1) {
                 rb_RConfidentalProfile.setChecked(true);
@@ -362,15 +384,15 @@ public class Controller {
         MessageI msgI = null;
         try {
 
-            int intCheckedID = rgConfidential.getCheckedRadioButtonId();
+            int intCheckedID = rg_Nu_Confidential.getCheckedRadioButtonId();
 
 
-            if (intCheckedID == rb_NConfidential.getId()) {
+            if (intCheckedID == rb_Nu_NConfidentalInfo.getId()) {
                 msgI = new MessageI(e.encrypt(etNuTitle.getText().toString())
                         , e.encrypt(etNuFirstName.getText().toString())
                         , e.encrypt(etNuLastName.getText().toString())
 
-                        , e.encrypt(strNewUserPicture)
+                        , e.encrypt(newUserPictureChecker(strNewUserPicture))
 
                         , (int) spRole.getSelectedItemId()
 
@@ -379,12 +401,12 @@ public class Controller {
 
                         , 2
                 );
-            } else if (intCheckedID == rb_RConfidential.getId()) {
+            } else if (intCheckedID == rb_Nu_RConfidentalInfo.getId()) {
                 msgI = new MessageI(e.encrypt(etNuTitle.getText().toString())
                         , e.encrypt(etNuFirstName.getText().toString())
                         , e.encrypt(etNuLastName.getText().toString())
 
-                        , e.encrypt(strNewUserPicture)
+                        , e.encrypt(newUserPictureChecker(strNewUserPicture))
 
                         , (int) spRole.getSelectedItemId()
 
@@ -409,6 +431,20 @@ public class Controller {
         }
 
 
+    }
+
+    public String newUserPictureChecker(String strNewUserPicture){
+        String strEmpty=  "NoPicture";
+        if(strNewUserPicture !=null){
+            if(!strNewUserPicture.isEmpty()){
+                return strNewUserPicture;
+            }else {
+                return strEmpty;
+            }
+
+        }else {
+            return strEmpty;
+        }
     }
 
     public void clearNewUser() {
@@ -441,7 +477,7 @@ public class Controller {
     //----
 
     public void getAllEmployeeData() {
-        allEmployees =  null;
+        allEmployees = null;
         MessageSystem msgSys = new MessageSystem("");
         msgSys.setType(MessageType.AllUser);
         client.sendSysMessage(msgSys);
@@ -477,7 +513,7 @@ public class Controller {
         if (currentUser.getIntEmployeeID() == userCurrentSelectedUm.getIntEmployeeID()) {
             alertDialogBuilder.setTitle("Trying To Delete Yourself");
             alertDialogBuilder.setMessage("You are trying to commit forced Log out");
-            alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_YES), new DialogInterface.OnClickListener() {
+            alertDialogBuilder.setPositiveButton(mainActivity.getText(R.string.alertD_YES), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface arg0, int arg1) {
                     Toast.makeText(mainActivity, "You have deleted yourself and have been logged out from the system.", Toast.LENGTH_SHORT).show();
@@ -485,13 +521,13 @@ public class Controller {
                 }
             });
 
-            alertDialogBuilder.setNegativeButton(resources.getText(R.string.alertD_NO), new DialogInterface.OnClickListener() {
+            alertDialogBuilder.setNegativeButton(mainActivity.getText(R.string.alertD_NO), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface arg0, int arg1) {
                     Toast.makeText(mainActivity, "You did not delete yourself! Great I had faith in you!", Toast.LENGTH_SHORT).show();
                 }
             });
-            alertDialog = alertDialogBuilder.create();
+            AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         } else {
             MessageD messageD = new MessageD(userCurrentSelectedUm.getIntEmployeeID()
@@ -515,11 +551,15 @@ public class Controller {
         etUMTitle.setText(user.getStrTitle());
         etUMFirstName.setText(user.getStrFirstname());
         etUMLastName.setText(user.getStrLastname());
+        String strPicture = user.getStrPicture();
 
-        setIBNewPicture(
-                StringToBitMap(user.getStrPicture())
-                , ibUMPicture
-        );
+        if(!strPicture.substring(0,6).equals("NoPicture")) {
+
+            setIBNewPicture(
+                    StringToBitMap(user.getStrPicture())
+                    , ibUMPicture
+            );
+        }
 
         etUMPassword.setText(user.getStrPassword());
         etUMUserName.setText(user.getStrUserName());
@@ -544,11 +584,6 @@ public class Controller {
     /**
      * General
      */
-    /**
-     * TODO ON LOGIN
-     *
-     * @param messageRoles
-     */
 
     public void populateArrayListRoles(MessageRoles messageRoles) {
         arrRoles.add(messageRoles.getStrRole());
@@ -570,7 +605,6 @@ public class Controller {
         }
     }
 
-
     private User messageUserToUser(MessageUser msgU) {
         User user = null;
         try {
@@ -589,7 +623,7 @@ public class Controller {
 
                     , msgU.getIntUserID()
                     , decryption.decrypt(msgU.getStrUserName())
-                    , decryption.decrypt(msgU.getStrLastname())
+                    , decryption.decrypt(msgU.getStrPassword())
 
                     , msgU.getIntConfidentialID()
                     , msgU.getIntGetsConfidentialInfo()
@@ -600,7 +634,6 @@ public class Controller {
         }
         return user;
     }
-
 
     public void sendUpdateUser(User user) {
         MessageU msgU = new MessageU(user.getIntEmployeeID()
@@ -694,13 +727,14 @@ public class Controller {
 
     public Bitmap StringToBitMap(String encodedString) {
         try {
-            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            return bitmap;
+            if(!encodedString.isEmpty() && !encodedString.equals("NoPicture")) {
+                byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            }
         } catch (Exception e) {
             e.getMessage();
-            return null;
         }
+        return null;
     }
 
     /**
@@ -709,120 +743,161 @@ public class Controller {
 
 
     public void setEtLogServerCon(EditText etLogServerCon) {
-        this.etLogServerCon = etLogServerCon;
+        if (etLogServerCon != null) {
+            this.etLogServerCon = etLogServerCon;
+        }
     }
 
     public void setEtPatientInformation(EditText etPatientInformation) {
-        this.etPatientInformation = etPatientInformation;
+        if (etPatientInformation != null) {
+            this.etPatientInformation = etPatientInformation;
+        }
     }
 
     public void setEtLoginUsername(EditText etLoginUserName) {
-        this.etLoginUserName = etLoginUserName;
-
+        if (etLoginUserName != null) {
+            this.etLoginUserName = etLoginUserName;
+        }
     }
 
     public void setEtLoginPassword(EditText etPassword) {
-        this.etLoginPassword = etPassword;
+        if (etPassword != null) {
+            this.etLoginPassword = etPassword;
+        }
     }
 
     public void setTvLoginInformation(TextView tvLoginInformation) {
-        this.tvLoginInformation = tvLoginInformation;
+        if (tvLoginInformation != null) {
+            this.tvLoginInformation = tvLoginInformation;
+        }
     }
 
     //Profile Setter
 
     public void setEtProfileFirstName(EditText etProfileFirstName) {
-        this.etProfileFirstName = etProfileFirstName;
+        if (etProfileFirstName != null) {
+            this.etProfileFirstName = etProfileFirstName;
 
+        }
     }
 
     public void setEtProfileLastName(EditText etProfileLastName) {
-        this.etProfileLastName = etProfileLastName;
+        if (etProfileLastName != null) {
+            this.etProfileLastName = etProfileLastName;
 
+        }
     }
 
     public void setEtProfileTitle(EditText etProfileTitle) {
-        this.etProfileTitle = etProfileTitle;
+        if (etProfileTitle != null) {
+            this.etProfileTitle = etProfileTitle;
 
+        }
     }
 
     public void setEtProfileRole(EditText etProfileRole) {
-        this.etProfileRole = etProfileRole;
+        if (etProfileRole != null) {
+            this.etProfileRole = etProfileRole;
+        }
     }
 
-    public void setEtProfileConfidentialInfo(EditText etProfileConfidentialInfo) {
-        this.etProfileConfidentialInfo = etProfileConfidentialInfo;
-    }
 
     public void setEtProfileUserName(EditText etProfileUserName) {
-        this.etProfileUserName = etProfileUserName;
+        if (etProfileUserName != null) {
+            this.etProfileUserName = etProfileUserName;
+        }
     }
 
     public void setEtProfilePassword(EditText etProfilePassword) {
-        this.etProfilePassword = etProfilePassword;
+        if (etProfilePassword != null) {
+            this.etProfilePassword = etProfilePassword;
+        }
     }
 
     public void setIvProfilePicture(ImageView ivProfilePicture) {
-        this.ivProfilePicture = ivProfilePicture;
+        if (ivProfilePicture != null) {
+            this.ivProfilePicture = ivProfilePicture;
+        }
     }
 
     public void setBtnProfileUpdate(Button btnProfileUpdate) {
-        this.btnProfileUpdate = btnProfileUpdate;
+        if (btnProfileUpdate != null) {
+            this.btnProfileUpdate = btnProfileUpdate;
+        }
     }
 
     public void setRgProfile(RadioGroup rgProfile) {
-        this.rgProfile = rgProfile;
+        if (rgProfile != null) {
+            this.rgProfile = rgProfile;
+        }
     }
 
     public void setRb_RConfidentalProfile(RadioButton rb_RConfidentalProfile) {
-        this.rb_RConfidentalProfile = rb_RConfidentalProfile;
+        if (rb_RConfidentalProfile != null) {
+            this.rb_RConfidentalProfile = rb_RConfidentalProfile;
+        }
     }
 
     public void setRb_NConfidentalProfile(RadioButton rb_NConfidentalProfile) {
-        this.rb_NConfidentalProfile = rb_NConfidentalProfile;
+        if (rb_NConfidentalProfile != null) {
+            this.rb_NConfidentalProfile = rb_NConfidentalProfile;
+        }
     }
 
     // New User Setters
     public void setEtNuFirstName(EditText etNuFirstName) {
-        this.etNuFirstName = etNuFirstName;
+        if (etNuFirstName != null) {
+            this.etNuFirstName = etNuFirstName;
+        }
     }
 
-    public void setRgConfidential(RadioGroup rg) {
-        this.rgConfidential = rg;
+    public void setRgConfidential(RadioGroup rg_Nu_Confidential) {
+        this.rg_Nu_Confidential = rg_Nu_Confidential;
     }
 
-    public void setRb_RConfidential(RadioButton rb_RConfidential) {
-        this.rb_RConfidential = rb_RConfidential;
+    public void setRb_Nu_RConfidentalInfo(RadioButton rb_Nu_RConfidentalInfo) {
+        this.rb_Nu_RConfidentalInfo = rb_Nu_RConfidentalInfo;
     }
 
-    public void setRb_NConfidential(RadioButton rb_NConfidential) {
-        this.rb_NConfidential = rb_NConfidential;
+    public void setRb_Nu_NConfidentalInfo(RadioButton rb_Nu_NConfidentalInfo) {
+        this.rb_Nu_NConfidentalInfo = rb_Nu_NConfidentalInfo;
     }
 
 
     public void setIBNewPicture(ImageButton ibNewPicture) {
-        this.ibNewPicture = ibNewPicture;
+        if (ibNewPicture != null) {
+            this.ibNewPicture = ibNewPicture;
+        }
     }
 
     public void setEtNuLastName(EditText etNuLastName) {
-        this.etNuLastName = etNuLastName;
+        if (etNuLastName != null) {
+            this.etNuLastName = etNuLastName;
+        }
     }
 
     public void setEtNuPassword(EditText etNuPassword) {
-        this.etNuPassword = etNuPassword;
+        if (etNuPassword != null) {
+            this.etNuPassword = etNuPassword;
+        }
     }
 
     public void setEtNuUserName(EditText etNuUserName) {
-        this.etNuUserName = etNuUserName;
+        if (etNuUserName != null) {
+            this.etNuUserName = etNuUserName;
+        }
     }
 
     public void setStrNewUserPicture(String strNewUserPicture) {
-        this.strNewUserPicture = strNewUserPicture;
+        if (!strNewUserPicture.isEmpty()) {
+            this.strNewUserPicture = strNewUserPicture;
+        }
     }
 
 
     public void setIntNuRoleID(int intNuRoleID) {
         this.intNuRoleID = intNuRoleID;
+
     }
 
     public void setIntNuTitleID(int intNuTitleID) {
@@ -830,41 +905,65 @@ public class Controller {
     }
 
     public void setEtNuTitle(EditText etNuTitle) {
-        this.etNuTitle = etNuTitle;
+        if (etNuTitle != null) {
+            this.etNuTitle = etNuTitle;
+        }
     }
 
     public void setSpRole(Spinner spRole) {
-        this.spRole = spRole;
+        if (spRole != null) {
+            this.spRole = spRole;
+        }
     }
 
     public void setEtUMFirstName(EditText etUMFirstName) {
-        this.etUMFirstName = etUMFirstName;
+        if (etUMFirstName != null) {
+            this.etUMFirstName = etUMFirstName;
+        }
     }
+    public void setUMNewPicture(ImageButton ibUMPicture) {
+        if (ibUMPicture != null) {
+            this.ibUMPicture = ibUMPicture;
+        }
+    }
+
 
     //User Management Setters
 
     public void setEtUMTitle(EditText etUMTitle) {
-        this.etUMTitle = etUMTitle;
+        if (etUMTitle != null) {
+            this.etUMTitle = etUMTitle;
+        }
     }
 
     public void setEtUMLastName(EditText etUMLastName) {
-        this.etUMLastName = etUMLastName;
+        if (etUMLastName != null) {
+            this.etUMLastName = etUMLastName;
+        }
     }
 
     public void setEtUMPassword(EditText etUMPassword) {
-        this.etUMPassword = etUMPassword;
+        if (etUMPassword != null) {
+            this.etUMPassword = etUMPassword;
+        }
     }
 
     public void setEtUMUserName(EditText etUMUserName) {
-        this.etUMUserName = etUMUserName;
+        if (etUMUserName != null) {
+            this.etUMUserName = etUMUserName;
+        }
     }
 
     public void setStrUMPicture(String strUMPicture) {
-        this.strUMPicture = strUMPicture;
+        if (!strNewUserPicture.isEmpty()) {
+            this.strUMPicture = strUMPicture;
+        }
     }
 
     public void setSpUMRole(Spinner spUMRole) {
-        this.spUMRole = spUMRole;
+        if (spUMRole != null) {
+            this.spUMRole = spUMRole;
+        }
     }
 
     public void setIntUMRoleID(int intUMRoleID) {

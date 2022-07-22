@@ -1,55 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment_PatientInformation">
+    tools:context=".Fragment_UserManagement">
 
-    <EditText
-        android:id="@+id/etPatientInformation"
-        android:layout_width="307dp"
-        android:layout_height="450dp"
-        android:layout_marginStart="62dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="62dp"
-        android:layout_marginBottom="90dp"
-        android:ems="10"
-        android:gravity="start|top"
-        android:inputType="textMultiLine"
-        android:textIsSelectable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
-    <TextView
-        android:id="@+id/tvPatientInformationTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="88dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginBottom="81dp"
-        android:text="Patient Information"
-        app:layout_constraintBottom_toTopOf="@+id/etPatientInformation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView3"
-        app:layout_constraintTop_toTopOf="parent" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-127dp">
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="124dp"
-        android:layout_height="139dp"
-        android:layout_marginStart="62dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="14dp"
-        android:src="@drawable/ic_patient_48"
-        app:layout_constraintBottom_toTopOf="@+id/etPatientInformation"
-        app:layout_constraintEnd_toStartOf="@+id/tvPatientInformationTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/frameLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".Fragment_PatientInformation">
+
+            <EditText
+                android:id="@+id/etPatientInformation"
+                android:layout_width="307dp"
+                android:layout_height="450dp"
+                android:layout_marginStart="62dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="62dp"
+                android:layout_marginBottom="90dp"
+                android:ems="10"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                android:textIsSelectable="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+
+            <TextView
+                android:id="@+id/tvPatientInformationTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="88dp"
+                android:layout_marginEnd="100dp"
+                android:layout_marginBottom="81dp"
+                android:scrollbars = "vertical"
+                app:layout_constraintBottom_toTopOf="@+id/etPatientInformation"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView3"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="124dp"
+                android:layout_height="139dp"
+                android:layout_marginStart="62dp"
+                android:layout_marginTop="49dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="14dp"
+                android:src="@drawable/ic_patient_48"
+                app:layout_constraintBottom_toTopOf="@+id/etPatientInformation"
+                app:layout_constraintEnd_toStartOf="@+id/tvPatientInformationTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</FrameLayout>

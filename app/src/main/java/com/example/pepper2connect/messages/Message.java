@@ -17,13 +17,12 @@ import javax.crypto.NoSuchPaddingException;
 public abstract class Message {
     protected MessageType type;
     private boolean value;
-    private static Encryption encryption;
-    private static Decryption decryption;
+
+    private static BufferedReader bfr;
+    private static OutputStreamWriter out;
+
     public Message(MessageType type) {
         this.type = type;
-
-        encryption = new Encryption();
-        decryption = new Decryption();
     }
 
     /**
@@ -31,13 +30,14 @@ public abstract class Message {
      * @param socket
      */
     public void send(Socket socket) {
-        OutputStreamWriter out;
         try {
-            String strEncryptedMessage;
-            out = new OutputStreamWriter(socket.getOutputStream());
+            //String strEncryptedMessage;
+            if(out == null){
+
+                out = new OutputStreamWriter(socket.getOutputStream());
+            }
+
             logger.info("Sending message Plain message: " + this.toString());
-            strEncryptedMessage =encryption.encrypt(this.toString());
-            logger.info("Sending message Encrypted message: " + strEncryptedMessage);
             out.write(this.toString() + "\n");
             out.flush();
         } catch (IOException e) {
@@ -52,19 +52,21 @@ public abstract class Message {
      * @return
      */
     public static Message receive(Socket socket) {
-        BufferedReader bfr;
         Message message = null;
         try {
-            bfr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            if(bfr == null) {
+                bfr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            }
+
             String msgText = bfr.readLine(); // Will wait here for complete line
             if (msgText != null) {
                 logger.info("Receiving  Encrypted message: " + msgText);
 
-                String strDecryptedMessage = decryption.decrypt(msgText);
-                logger.info("Receiving  Decrypted message: " + strDecryptedMessage);
+              //  String strDecryptedMessage = decryption.decrypt(msgText);
+                logger.info("Receiving  Decrypted message: " + msgText);
 
                 // Parse message
-                String[] parts = strDecryptedMessage.split("\\|");
+                String[] parts = msgText.split("\\|");
 
                 if (parts[0].equals(MessageType.Disconnect.toString())) {
                     message = new MessageSystem(
@@ -86,12 +88,6 @@ public abstract class Message {
 
                 }else if (parts[0].equals(MessageType.LogOut.toString())) {
                     message.setType(MessageType.LogOut);
-
-                } else if (parts[0].equals(MessageType.Disconnect.toString())) {
-                    message = new MessageSystem(
-                            parts[1]
-                    );
-                    message.setType(MessageType.Disconnect);
 
                 } else if (parts[0].equals(MessageType.Patient.toString())) {
                     message = new MessageSystem(
@@ -174,10 +170,6 @@ public abstract class Message {
             logger.warning(e.toString());
             //Controller.ClientIsConnected.set(false);
            // Controller.ServerIsStarted.set(false);
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
         }
         return message;
     }

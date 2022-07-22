@@ -25,13 +25,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.pepper2connect.controller.Controller;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,19 +40,14 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog alertDialog;
     private final Controller controller = new Controller(this);
 
-    private boolean isCreatedPatient = false;
-    private boolean isCreatedLogin = false;
-    private boolean isCreatedProfile = false;
-    private boolean isCreatedServer = false;
-
     Resources resources = Resources.getSystem();
-    Fragment_Login frgLogin = new Fragment_Login();
+    Fragment_Login frgLogin = new Fragment_Login(controller);
     Fragment_Profile frgProfile = new Fragment_Profile(this, controller);
-    Fragment_PatientInformation frgPatient = new Fragment_PatientInformation();
-    Fragment_ServerConnection frgServer = new Fragment_ServerConnection();
+    Fragment_PatientInformation frgPatient = new Fragment_PatientInformation(controller);
+    Fragment_ServerConnection frgServer = new Fragment_ServerConnection(controller);
 
-    Fragment_NewUser fragment_newUser = new Fragment_NewUser();
-    Fragment_UserManagement fragment_userManagement = new Fragment_UserManagement();
+    Fragment_NewUser fragment_newUser = new Fragment_NewUser(controller, this);
+    Fragment_UserManagement fragment_userManagement = new Fragment_UserManagement(controller, this);
 
     public FragmentManager frgMng = getSupportFragmentManager();
     Fragment activeFragment = frgLogin;
@@ -68,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         try {
+
             alertDialogBuilder = new AlertDialog.Builder(this);
 
             bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -82,250 +76,140 @@ public class MainActivity extends AppCompatActivity {
             frgMng.beginTransaction().add(R.id.container, frgLogin, "frgLogin").commit();
 
             bottomNavigationView.setOnItemSelectedListener(item -> {
-                if (activeFragment.getTag().equals(frgMng.findFragmentByTag("frgNewUser").getTag())) {
-                    frgMng.beginTransaction().hide(activeFragment).commit();
-                }
-                switch (item.getItemId()) {
-                    case R.id.navigation_Login:
-                        if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgLogin").getTag())) {
-                            frgMng.beginTransaction().hide(activeFragment).show(frgLogin).commit();
-                            activeFragment = frgLogin;
-                            if (!isCreatedLogin) {
-                                initiateLoginControls();
-                            }
-                            return true;
-                        }
-                        break;
+                try {
+                    if (activeFragment.getTag().equals(frgMng.findFragmentByTag("frgNewUser").getTag())) {
+                        frgMng.beginTransaction().hide(activeFragment).commit();
+                    }
 
-                    case R.id.navigation_PatientInformation:
-                        if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgPatient").getTag())) {
-                            if (controller.isLoggedIn) {
-                                frgMng.beginTransaction().hide(activeFragment).show(frgPatient).commit();
-                                activeFragment = frgPatient;
-
-                                if (!isCreatedPatient) {
-                                    initiatePatientControls();
-                                }
-                                controller.checkPatientInfoBuffer();
-
-                                return true;
-                            } else {
-                                alertDialogBuilder.setTitle(resources.getText(R.string.Not_Logged_In_Title));
-                                alertDialogBuilder.setMessage(resources.getText(R.string.Not_Logged_In_Text));
-                                alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface arg0, int arg1) {
-                                        Toast.makeText(MainActivity.this, resources.getText(R.string.Page_not_Changed), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                alertDialog = alertDialogBuilder.create();
-                                alertDialog.show();
-                                return false;
-                            }
-                        } else {
-                            return false;
-                        }
-                    case R.id.navigation_Profile:
-                        if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgProfile").getTag())) {
-                            if (controller.isLoggedIn) {
-                                frgMng.beginTransaction().hide(activeFragment).show(frgProfile).commit();
-                                activeFragment = frgProfile;
-
-                                if (!isCreatedProfile) {
-                                    initiateProfileControls();
-                                }
-
-                                controller.fillProfile();
-
-                                return true;
-                            } else {
-                                alertDialogBuilder.setTitle(resources.getText(R.string.Not_Logged_In_Title));
-                                alertDialogBuilder.setMessage(resources.getText(R.string.Not_Logged_In_Text));
-                                alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface arg0, int arg1) {
-                                        Toast.makeText(MainActivity.this, resources.getText(R.string.Page_not_Changed), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                alertDialog = alertDialogBuilder.create();
-                                alertDialog.show();
-                                return false;
-                            }
-                        } else {
-                            return false;
-                        }
-                    case R.id.navigation_ServerConnection:
-                        if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgServer").getTag())) {
-
-                            frgMng.beginTransaction().hide(activeFragment).show(frgServer).commit();
-                            activeFragment = frgServer;
-
-                            if (!isCreatedServer) {
-                                initiateServerControls();
-                            }
-
-                            ImageView iv = findViewById(R.id.iv_Robot);
-                            if (controller.isClientConnected) {
-                                iv.setColorFilter(getColor(R.color.connected_Green));
-                            } else {
-
-                                iv.setColorFilter(getColor(R.color.disconnected_red));
-                            }
-                            controller.checkLogServerConBuffer();
-                            return true;
-
-                        } else {
-                            return false;
-                        }
-                    case R.id.navigation_Logout:
-                        if (controller.isLoggedIn) {
-                            alertDialogBuilder.setTitle(resources.getText(R.string.Log_Out_Title));
-                            alertDialogBuilder.setMessage(resources.getText(R.string.Log_Out_Text));
-                            alertDialogBuilder.setPositiveButton(resources.getText(R.string.alertD_YES), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface arg0, int arg1) {
-                                    Toast.makeText(MainActivity.this, resources.getText(R.string.Yes_Log_Out_Text), Toast.LENGTH_LONG).show();
-                                    controller.clientLogOut();
+                    switch (item.getItemId()) {
+                        case R.id.navigation_Login:
+                            if (!controller.isLoggedIn) {
+                                if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgLogin").getTag())) {
                                     frgMng.beginTransaction().hide(activeFragment).show(frgLogin).commit();
+                                    activeFragment = frgLogin;
+                                    return true;
                                 }
-                            });
-                            alertDialogBuilder.setNegativeButton(resources.getText(R.string.alertD_NO), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(MainActivity.this, resources.getText(R.string.No_Log_Out_Text), Toast.LENGTH_LONG).show();
+                                break;
+                            } else {
+                                alertDialogBuilder.setTitle("Allready Logged IN");
+                                alertDialogBuilder.setMessage(getText(R.string.Not_Logged_In_Text));
+                                alertDialogBuilder.setPositiveButton(getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface arg0, int arg1) {
+                                        Toast.makeText(MainActivity.this, getText(R.string.Page_not_Changed), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
+                            }
+                        case R.id.navigation_PatientInformation:
+                            if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgPatient").getTag())) {
+                                if (controller.isLoggedIn) {
+                                    frgMng.beginTransaction().hide(activeFragment).show(frgPatient).commit();
+                                    activeFragment = frgPatient;
+
+                                    controller.checkPatientInfoBuffer();
+
+                                    return true;
+                                } else {
+                                    alertDialogBuilder.setTitle(getText(R.string.Not_Logged_In_Title));
+                                    alertDialogBuilder.setMessage(getText(R.string.Not_Logged_In_Text));
+                                    alertDialogBuilder.setPositiveButton(getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface arg0, int arg1) {
+                                            Toast.makeText(MainActivity.this, getText(R.string.Page_not_Changed), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    alertDialog = alertDialogBuilder.create();
+                                    alertDialog.show();
+                                    return false;
                                 }
-                            });
+                            } else {
+                                return false;
+                            }
+                        case R.id.navigation_Profile:
+                            if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgProfile").getTag())) {
+                                if (controller.isLoggedIn) {
+                                    frgMng.beginTransaction().hide(activeFragment).show(frgProfile).commit();
+                                    activeFragment = frgProfile;
 
-                            alertDialog = alertDialogBuilder.create();
-                            alertDialog.show();
-                        }
+                                    controller.fillProfile();
 
-                        break;
+                                    return true;
+                                } else {
+                                    alertDialogBuilder.setTitle(getText(R.string.Not_Logged_In_Title));
+                                    alertDialogBuilder.setMessage(getText(R.string.Not_Logged_In_Text));
+                                    alertDialogBuilder.setPositiveButton(getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface arg0, int arg1) {
+                                            Toast.makeText(MainActivity.this, getText(R.string.Page_not_Changed), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    alertDialog = alertDialogBuilder.create();
+                                    alertDialog.show();
+                                    return false;
+                                }
+                            } else {
+                                return false;
+                            }
+                        case R.id.navigation_ServerConnection:
+                            if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgServer").getTag())) {
+
+                                frgMng.beginTransaction().hide(activeFragment).show(frgServer).commit();
+                                activeFragment = frgServer;
+
+                                ImageView iv = findViewById(R.id.iv_Robot);
+                                if (controller.isClientConnected) {
+                                    iv.setColorFilter(getColor(R.color.connected_Green));
+                                } else {
+
+                                    iv.setColorFilter(getColor(R.color.disconnected_red));
+                                }
+                                controller.checkLogServerConBuffer();
+                                return true;
+
+                            } else {
+                                return false;
+                            }
+                        case R.id.navigation_Logout:
+                            if (controller.isLoggedIn) {
+                                alertDialogBuilder.setTitle(this.getText(R.string.Log_Out_Title));
+                                alertDialogBuilder.setMessage(this.getText(R.string.Log_Out_Text));
+                                alertDialogBuilder.setPositiveButton(this.getText(R.string.alertD_YES), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface arg0, int arg1) {
+                                        Toast.makeText(MainActivity.this, getText(R.string.Yes_Log_Out_Text), Toast.LENGTH_LONG).show();
+                                        controller.clientLogOut();
+                                        frgMng.beginTransaction().hide(activeFragment).show(frgLogin).commit();
+                                    }
+                                });
+                                alertDialogBuilder.setNegativeButton(this.getText(R.string.alertD_NO), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(MainActivity.this, getText(R.string.No_Log_Out_Text), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+
+                                alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
+                            }
+
+                            break;
+                    }
+                } catch (Exception ex) {
+                    String err = "";
+                    err = ex.getMessage();
+                    err += "";
                 }
                 return false;
             });
+
         } catch (Exception ex) {
             String err = "";
             err = ex.getMessage();
             err += "\n ";
         }
     }
-
-    public void initiateServerControls() {
-        try {
-
-
-            btnTestConnection = findViewById(R.id.btnTestConnection);
-            btnTestConnection.setOnClickListener(view -> controller.testServerConnection());
-
-            EditText etLogServerCon = findViewById(R.id.etLogServerCon);
-            etLogServerCon.setFocusable(false);
-            etLogServerCon.setKeyListener(null);
-
-            controller.setEtLogServerCon(etLogServerCon);
-            isCreatedServer = true;
-        } catch (Exception ex) {
-            String err = "";
-            err = ex.getMessage();
-            isCreatedServer = false;
-        }
-    }
-
-    public void initiatePatientControls() {
-        try {
-            EditText etPatientInformation = findViewById(R.id.etPatientInformation);
-            etPatientInformation.setFocusable(false);
-            etPatientInformation.setKeyListener(null);
-            controller.setEtPatientInformation(etPatientInformation);
-            isCreatedPatient = true;
-        } catch (Exception ex) {
-            String err = "";
-            err = ex.getMessage();
-            isCreatedPatient = false;
-        }
-    }
-
-    public void initiateProfileControls() {
-        try {
-
-
-            ImageView ivProfilePicture = findViewById(R.id.ivProfilePicture);
-            ivProfilePicture.setFocusable(false);
-            controller.setIvProfilePicture(ivProfilePicture);
-
-            EditText etProfileTitle = findViewById(R.id.etProfileTitle);
-            //etProfileTitle.setKeyListener(null);
-            //etProfileTitle.setFocusable(false);
-            controller.setEtProfileTitle(etProfileTitle);
-
-            EditText etProfileFirstName = findViewById(R.id.etProfileFirstName);
-            //etProfileFirstName.setKeyListener(null);
-           //etProfileFirstName.setFocusable(false);
-            controller.setEtProfileFirstName(etProfileFirstName);
-
-            EditText etProfileLastName = findViewById(R.id.etProfileLastName);
-            //etProfileLastName.setKeyListener(null);
-            //etProfileLastName.setFocusable(false);
-            controller.setEtProfileLastName(etProfileLastName);
-
-            EditText etProfileRole = findViewById(R.id.etProfileRole);
-            etProfileRole.setKeyListener(null);
-            etProfileRole.setFocusable(false);
-            controller.setEtProfileRole(etProfileRole);
-
-
-            EditText etProfileUserName = findViewById(R.id.etProfileUserName);
-            etProfileUserName.setKeyListener(null);
-            etProfileUserName.setFocusable(false);
-            controller.setEtProfileUserName(etProfileUserName);
-
-            EditText etProfilePassword = findViewById(R.id.etProfilePassword);
-            //etProfilePassword.setKeyListener(null);
-            //etProfilePassword.setFocusable(false);
-            controller.setEtProfilePassword(etProfilePassword);
-
-            RadioButton rb_NConfidentalProfile = findViewById(R.id.rb_NConfidentalProfile);
-            rb_NConfidentalProfile.setKeyListener(null);
-            rb_NConfidentalProfile.setFocusable(false);
-            controller.setRb_NConfidentalProfile(rb_NConfidentalProfile);
-
-            RadioButton rb_RConfidentalProfile = findViewById(R.id.rb_RConfidentalProfile);
-            rb_RConfidentalProfile.setKeyListener(null);
-            rb_RConfidentalProfile.setFocusable(false);
-            controller.setRb_RConfidentalProfile(rb_RConfidentalProfile);
-
-            Button btnProfileUpdate = findViewById(R.id.btnProfileUpdate);
-            btnProfileUpdate.setOnClickListener(view -> controller.updateProfile());
-
-            isCreatedProfile = true;
-        } catch (Exception ex) {
-            String err = "";
-            err = ex.getMessage();
-            isCreatedProfile = false;
-        }
-    }
-
-    public void initiateLoginControls() {
-        try {
-            btnLogin = findViewById(R.id.btnLogin);
-            btnLogin.setOnClickListener(view -> {
-                EditText etLoginUserName = findViewById(R.id.etLoginUserName);
-                controller.setEtLoginUsername(etLoginUserName);
-                EditText etLoginPassword = findViewById(R.id.etLoginPassword);
-                controller.setEtLoginPassword(etLoginPassword);
-                TextView tvLoginInformation = findViewById(R.id.tvLoginInformation);
-                controller.setTvLoginInformation(tvLoginInformation);
-
-                controller.connect2Pepper(etLoginUserName.getText().toString(), etLoginPassword.getText().toString());
-            });
-            isCreatedLogin = true;
-        } catch (Exception ex) {
-            String err = "";
-            err = ex.getMessage();
-            isCreatedLogin = false;
-        }
-    }
-
 
     public static boolean checkAndRequestPermissions(final Activity context) {
         int WExtstorePermission = ContextCompat.checkSelfPermission(context,
@@ -468,5 +352,21 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         }
+    }
+
+    public Fragment_Login getFrgLogin() {
+        return frgLogin;
+    }
+
+    public Fragment_Profile getFrgProfile() {
+        return frgProfile;
+    }
+
+    public Fragment_PatientInformation getFrgPatient() {
+        return frgPatient;
+    }
+
+    public Fragment_ServerConnection getFrgServer() {
+        return frgServer;
     }
 }

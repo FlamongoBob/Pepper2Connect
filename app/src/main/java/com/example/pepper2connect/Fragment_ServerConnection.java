@@ -8,26 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.pepper2connect.controller.Controller;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Fragment_ServerConnection#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class Fragment_ServerConnection extends Fragment {
-    View viewServerConnection;
+    private Button btnTestConnection;
+    private Controller controller;
 
-    public Fragment_ServerConnection() {
-        // Required empty public constructor
-    }
 
-    public static Fragment_ServerConnection newInstance() {
-        Fragment_ServerConnection fragment = new Fragment_ServerConnection();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+    public Fragment_ServerConnection(Controller controller) {
+        this.controller = controller;
     }
 
     @Override
@@ -39,19 +30,30 @@ public class Fragment_ServerConnection extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        viewServerConnection = inflater.inflate(R.layout.fragment__server_connection, container, false);
-       /*
-        btnTestConnection = (Button) viewServerConnection.findViewById(R.id.btnTestConnection);
-        btnTestConnection.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                testServerConnection();
-            }
-        });
-        */
+        View vRoot = inflater.inflate(R.layout.fragment__server_connection, container, false);
+        initiateServerControls(vRoot);
+        return vRoot;
+    }
 
-        // Inflate the layout for this fragment
-        return viewServerConnection;
+    public void initiateServerControls(View vRoot) {
+        try {
+
+
+            btnTestConnection = vRoot.findViewById(R.id.btnTestConnection);
+            btnTestConnection.setOnClickListener(view -> controller.testServerConnection());
+
+            EditText etLogServerCon = vRoot.findViewById(R.id.etLogServerCon);
+            //etLogServerCon.setFocusable(false);
+            etLogServerCon.setKeyListener(null);
+            etLogServerCon.setHorizontallyScrolling(true);
+
+            controller.setEtLogServerCon(etLogServerCon);
+            //isCreatedServer = true;
+        } catch (Exception ex) {
+            String err = "";
+            err = ex.getMessage();
+            //isCreatedServer = false;
+        }
     }
 
 }

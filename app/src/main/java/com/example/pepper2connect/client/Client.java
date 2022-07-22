@@ -20,7 +20,7 @@ public class Client {
     public Client(String strIP, int intPort, String strUserName, String strPassword, Controller controller) {
         if (!controller.isClientConnected) {
             cModel = new Clientmodel(controller);
-            cModel.StartServer(controller.isClientConnected, strUserName, strPassword,strIP,intPort);
+            cModel.StartServer(strUserName, strPassword,strIP,intPort);
 
             //cModel.connect(strIP, intPort, strName, strPassword);
             //cModel.newestMessage.addListener((o, oldValue, newValue) -> view.textArea.appendText(newValue));

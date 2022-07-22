@@ -7,58 +7,46 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Fragment_PatientInformation#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.example.pepper2connect.controller.Controller;
+
 public class Fragment_PatientInformation extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private Controller controller;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public Fragment_PatientInformation() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment_PatientInformation.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static Fragment_PatientInformation newInstance(String param1, String param2) {
-        Fragment_PatientInformation fragment = new Fragment_PatientInformation();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public Fragment_PatientInformation(Controller controller) {
+        this.controller = controller;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment__patient_information, container, false);
+        View vRoot = inflater.inflate(R.layout.fragment__patient_information, container, false);
+        initiatePatientControls(vRoot);
+
+        return vRoot;
     }
+
+
+
+    public void initiatePatientControls(View vRoot) {
+        try {
+            EditText etPatientInformation = vRoot.findViewById(R.id.etPatientInformation);
+            etPatientInformation.setFocusable(false);
+            etPatientInformation.setKeyListener(null);
+            controller.setEtPatientInformation(etPatientInformation);
+            //isCreatedPatient = true;
+        } catch (Exception ex) {
+            String err = "";
+            err = ex.getMessage();
+            //isCreatedPatient = false;
+        }
+    }
+
 }
