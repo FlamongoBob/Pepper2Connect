@@ -5,6 +5,8 @@ import static java.lang.Boolean.valueOf;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.core.app.NotificationCompat;
+
 import com.example.pepper2connect.Crypto.Encryption;
 import com.example.pepper2connect.controller.Controller;
 import com.example.pepper2connect.messages.*;
@@ -27,8 +29,6 @@ public class Clientmodel {
     String strIpAddress;
     int intPort;
     static OnProcessedListener listener;
-    static OnProcessedListener listener2;
-    private Encryption encrpytion = new Encryption();
 
     // Create some member variables for the ExecutorService
     // and for the Handler that will update the UI from the main thread
@@ -105,6 +105,8 @@ public class Clientmodel {
                             controller.appendLogServerCon(msg.getType());
 
                         } else if (msg.getType().equals(MessageType.Test)) {
+
+
 
                             controller.appendLogServerCon(msg.getType());
 

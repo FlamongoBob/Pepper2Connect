@@ -1,10 +1,13 @@
 package com.example.pepper2connect.controller;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.util.Base64;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,10 +21,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NotificationCompat;
 
 import com.example.pepper2connect.Crypto.Decryption;
 import com.example.pepper2connect.Crypto.Encryption;
-import com.example.pepper2connect.Fragment_Login;
 import com.example.pepper2connect.MainActivity;
 import com.example.pepper2connect.Model.User;
 import com.example.pepper2connect.R;
@@ -53,7 +56,7 @@ public class Controller {
     private Client client;
     Resources resources = Resources.getSystem();
 
-    final private String strServerIP ="10.0.2.2";// = "127.10.10.15";
+    final private String strServerIP = "10.0.2.2";// = "127.10.10.15";
     final private int intPort = 8888; //= 10284;
     Decryption decryption = new Decryption();
 
@@ -81,7 +84,7 @@ public class Controller {
 
 
     private AlertDialog.Builder alertDialogBuilder;
-   // private AlertDialog alertDialog;
+    // private AlertDialog alertDialog;
 
     private String strBufferPatientInfo = "", strBufferLogServerCon = "";
 
@@ -90,6 +93,8 @@ public class Controller {
     }
 
     public void connect2Pepper(String strUsername, String strPassword) {
+
+
         if (!isLoggedIn && !isClientConnected) {
             if (strUsername != null) {
                 if (!strUsername.isEmpty()) {
@@ -211,13 +216,13 @@ public class Controller {
                         break;
 
                 }
-               AlertDialog alertDialog = alertDialogBuilder.create();
+                AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
 
-            }catch(Exception ex){
-                String err ="";
+            } catch (Exception ex) {
+                String err = "";
                 err = ex.getMessage();
-                err+="";
+                err += "";
             }
 
         }
@@ -246,7 +251,10 @@ public class Controller {
         }
     }
 
+
     public void appendLogServerCon(MessageType msgType) {
+
+
 
         String strAppendString = "";
         strAppendString += "Last Message Type received: \n " + msgType.toString();
@@ -279,7 +287,7 @@ public class Controller {
      */
 
     //Profile Controlls
-    EditText etProfileLastName, etProfileTitle, etProfileFirstName, etProfileRole,  etProfileUserName, etProfilePassword;
+    EditText etProfileLastName, etProfileTitle, etProfileFirstName, etProfileRole, etProfileUserName, etProfilePassword;
     ImageView ivProfilePicture;
     Button btnProfileUpdate;
     RadioGroup rgProfile;
@@ -291,12 +299,10 @@ public class Controller {
                 && rb_RConfidentalProfile != null && rb_NConfidentalProfile != null
         ) {
             String strPicture = currentUser.getStrPicture();
-            if(!strPicture.substring(0,6).equals("NoPicture")) {
 
-                Bitmap bmPicture = StringToBitMap(strPicture);
-                if (bmPicture != null) {
-                    setIBNewPicture(bmPicture, ivProfilePicture);
-                }
+            Bitmap bmPicture = StringToBitMap(strPicture);
+            if (bmPicture != null) {
+                setIBNewPicture(bmPicture, ivProfilePicture);
             }
 
             etProfileTitle.setText(currentUser.getStrTitle());
@@ -433,16 +439,16 @@ public class Controller {
 
     }
 
-    public String newUserPictureChecker(String strNewUserPicture){
-        String strEmpty=  "NoPicture";
-        if(strNewUserPicture !=null){
-            if(!strNewUserPicture.isEmpty()){
+    public String newUserPictureChecker(String strNewUserPicture) {
+        String strEmpty = "NoPicture";
+        if (strNewUserPicture != null) {
+            if (!strNewUserPicture.isEmpty()) {
                 return strNewUserPicture;
-            }else {
+            } else {
                 return strEmpty;
             }
 
-        }else {
+        } else {
             return strEmpty;
         }
     }
@@ -553,13 +559,11 @@ public class Controller {
         etUMLastName.setText(user.getStrLastname());
         String strPicture = user.getStrPicture();
 
-        if(!strPicture.substring(0,6).equals("NoPicture")) {
 
-            setIBNewPicture(
-                    StringToBitMap(user.getStrPicture())
-                    , ibUMPicture
-            );
-        }
+        setIBNewPicture(
+                StringToBitMap(strPicture)
+                , ibUMPicture
+        );
 
         etUMPassword.setText(user.getStrPassword());
         etUMUserName.setText(user.getStrUserName());
@@ -727,9 +731,14 @@ public class Controller {
 
     public Bitmap StringToBitMap(String encodedString) {
         try {
-            if(!encodedString.isEmpty() && !encodedString.equals("NoPicture")) {
-                byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            String strSubstring = encodedString.substring(0, 9);
+            if (strSubstring.equals("NoPicture")) {
+                if (!encodedString.isEmpty()) {
+                    byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+                return bitmap;
+
+                }
             }
         } catch (Exception e) {
             e.getMessage();
@@ -921,6 +930,7 @@ public class Controller {
             this.etUMFirstName = etUMFirstName;
         }
     }
+
     public void setUMNewPicture(ImageButton ibUMPicture) {
         if (ibUMPicture != null) {
             this.ibUMPicture = ibUMPicture;

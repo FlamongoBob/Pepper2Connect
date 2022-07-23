@@ -369,4 +369,7 @@ public class MainActivity extends AppCompatActivity {
     public Fragment_ServerConnection getFrgServer() {
         return frgServer;
     }
+
+
+
 }
