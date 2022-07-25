@@ -10,6 +10,11 @@
     <color name="Pink">#ff15a0</color>
     <color name="connected_Green">#00B612</color>
     <color name="disconnected_red">#b50000</color>
+    <color name="Background_light">#8f1749</color>
+
+
+    <color name="Accent">#154664</color>
+
 
 
 

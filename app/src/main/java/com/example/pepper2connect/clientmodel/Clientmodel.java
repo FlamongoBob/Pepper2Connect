@@ -5,11 +5,10 @@ import static java.lang.Boolean.valueOf;
 import android.os.Handler;
 import android.os.Looper;
 
-import androidx.core.app.NotificationCompat;
-
-import com.example.pepper2connect.Crypto.Encryption;
+import com.example.pepper2connect.MainActivity;
 import com.example.pepper2connect.controller.Controller;
 import com.example.pepper2connect.messages.*;
+import com.example.pepper2connect.utils.NotificationUtil;
 
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -25,7 +24,7 @@ public class Clientmodel {
     private String strUserName;
     private String strPassword;
     Thread t;
-
+    MainActivity mainActivity;
     String strIpAddress;
     int intPort;
     static OnProcessedListener listener;
@@ -36,9 +35,9 @@ public class Clientmodel {
     Handler mHandler = new Handler(Looper.getMainLooper());
 
 
-    public Clientmodel(Controller controller) {
+    public Clientmodel(Controller controller, MainActivity mainActivity) {
         this.controller = controller;
-       // mExecutor.execute(sndMessageThread);
+        this.mainActivity = mainActivity;
     }
 
 
@@ -60,14 +59,12 @@ public class Clientmodel {
 
                         if (msg instanceof MessageSystem) {
 
-                            controller.appendLogServerCon(msg.getType());
+                            controller.appendLogServerCon("received", msg.getType());
 
-                            if (msg.getType().equals(MessageType.Disconnect)) {
-
-                                controller.disconnectFromPepper((MessageSystem) msg);
-                            } else if (msg.getType().equals(MessageType.Unsuccessful_LogIn)) {
+                            if (msg.getType().equals(MessageType.Unsuccessful_LogIn)) {
 
                                 controller.disconnectFromPepper((MessageSystem) msg);
+                                controller.backToLogin();
 
                             } else if (msg.getType().equals(MessageType.Successful_LogIn)) {
 
@@ -79,46 +76,46 @@ public class Clientmodel {
 
                             } else if (msg.getType().equals(MessageType.System)) {
 
-
-
+                                controller.showInformation(msg);
 
                             } else if (msg.getType().equals(MessageType.Suc_IUD)) {
 
-                                controller.showInformation((MessageSystem) msg);
+                                controller.showInformation(msg);
+
+                            } else if (msg.getType().equals(MessageType.Patient)) {
+
+                                NotificationUtil.createChannel(mainActivity, "Patient_Information");
+                                NotificationUtil.setNotification(mainActivity, "New Patient Information received"
+                                        , "The Patient is ready and there is information available in the Patient Information Tab");
+
+                                controller.appendPatientInformation((MessageSystem) msg);
+                                controller.appendLogServerCon("received", msg.getType());
 
                             }
                         }
 
-                        if (msg.getType().equals(MessageType.Patient)) {
-
-                            controller.appendPatientInformation((MessageSystem) msg);
-                            controller.appendLogServerCon(msg.getType());
-
-                        } else if (msg.getType().equals(MessageType.User)) {
+                        if (msg.getType().equals(MessageType.User)) {
 
                             controller.fillCurrentUser((MessageUser) msg);
-                            controller.appendLogServerCon(msg.getType());
+                            controller.appendLogServerCon("received", msg.getType());
 
                         } else if (msg.getType().equals(MessageType.Error)) {
 
                             controller.showInformation(msg);
-                            controller.appendLogServerCon(msg.getType());
+                            controller.appendLogServerCon("received", msg.getType());
 
                         } else if (msg.getType().equals(MessageType.Test)) {
-
-
-
-                            controller.appendLogServerCon(msg.getType());
+                            controller.appendLogServerCon("received", msg.getType());
 
                         } else if (msg.getType().equals(MessageType.AllUser)) {
 
                             controller.populateArrayAllUsers((MessageUser) msg);
-                            controller.appendLogServerCon(msg.getType());
+                            controller.appendLogServerCon("received", msg.getType());
 
                         } else if (msg.getType().equals(MessageType.Roles)) {
 
                             controller.populateArrayListRoles((MessageRoles) msg);
-                            controller.appendLogServerCon(msg.getType());
+                            controller.appendLogServerCon("received", msg.getType());
                         }
 
 
@@ -142,38 +139,48 @@ public class Clientmodel {
                  * @param msgConnect with Boolean false --> Trying to Connect, message to User
                  *                   with Boolean True -->  Connected to Server,  message to User
                  */
-                // MessageSystem msgSys = new MessageSystem("Connecting");
-                //msgSys.setType(MessageType.Connect);
-                //msgSys.setBoolean(false);
-
-                //listener.onProcessed(msgSys);
 
                 try {
 
                     socket = new Socket(strIpAddress, intPort);
 
                     if (socket != null) {
+                        controller.isClientConnected = true;
                         Login(strUserName, strPassword);
                     }
-                    controller.isClientConnected = true;
 
                     while (controller.isClientConnected) {
 
                         Message msg = Message.receive(socket);
+                        if(msg != null) {
+                            if (msg.getType().equals(MessageType.Test)) {
+                                responseTimer();
+                            } else {
+                                listener.onProcessed(msg);
 
-                        if (msg.getType().equals(MessageType.Test)) {
-                            responseTimer();
-                        } else {
-                            listener.onProcessed(msg);
+                            }
+                        }else {
+                            /*** TODO Unexpected Disconnect or Server is not Started
+                             *
+                             */
 
+                            MessageSystem msgSys = new MessageSystem("You have not been connected to the Server. " +
+                                    "Please make sure you are in the correct Wifi-Network and verify that the Server has been started");
+
+                            controller.showInformation(msgSys);
+                            socket = null;
+                            controller.isClientConnected = false;
+                            controller.isLoggedIn = false;
+                            break;
                         }
-
-
                     }
                 } catch (Exception e) {
                     // logger.warning(e.toString());
 
                     controller.isClientConnected = false;
+                    controller.isLoggedIn = false;
+                    socket = null;
+
                     String err = e.getMessage();
                     err += "";
 
@@ -216,10 +223,29 @@ public class Clientmodel {
         msgSysDisconnect.setType(MessageType.Disconnect);
         msgSysDisconnect.send(socket);
 
-        controller.isClientConnected = false;
-        controller.isLoggedIn = false;
-        mExecutor.shutdown();
 
+        shutDown();
+        controller.backToLogin();
+
+
+    }
+
+    public void shutDown() {
+        try {
+
+
+            socket.close();
+
+            controller.isClientConnected = false;
+            controller.isLoggedIn = false;
+
+            mExecutor.shutdown();
+
+        } catch (Exception ex) {
+            String err = "";
+            err = ex.getMessage();
+            err += "";
+        }
     }
 
     public void responseTimer() {
@@ -230,27 +256,24 @@ public class Clientmodel {
 
     public void sendMessage(Message message) {
         try {
-             new Thread(new Runnable() {
-                @Override
-                public void run() {
+            mExecutor.execute(
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
 
-                    if (message != null) {
-                        message.send(socket);
-                    }
+                            if (message != null) {
+                                message.send(socket);
+                            }
 
-                }
-            }).start();
-           // sndMessageThread.interrupt();
-
-            // mExecutor.execute(newBGSendMessage);
+                        }
+                    })
+            );
         } catch (Exception e) {
             String err = "";
             err = e.getMessage();
             err = "";
-            // logger.warning(e.toString());
         }
     }
-
 
 
 }

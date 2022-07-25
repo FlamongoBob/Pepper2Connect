@@ -19,10 +19,12 @@ public class Fragment_Login extends Fragment {
 
     Controller controller;
     Button btnLogin;
+    MainActivity mainActivity;
 
-    public Fragment_Login(Controller controller) {
+    public Fragment_Login(Controller controller,MainActivity mainActivity) {
         // Required empty public constructor
         this.controller = controller;
+        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -57,7 +59,13 @@ public class Fragment_Login extends Fragment {
             btnLogin.setOnClickListener(view -> {
                 TextView tvLoginInformation = vRoot.findViewById(R.id.tvLoginInformation);
                 controller.setTvLoginInformation(tvLoginInformation);
-                controller.connect2Pepper(etLoginUserName.getText().toString(), etLoginPassword.getText().toString());
+
+                if(mainActivity.mBound) {
+                    mainActivity.mService.connect2Pepper(etLoginUserName.getText().toString()
+                            , etLoginPassword.getText().toString()
+                            , this.controller);
+                }
+
             });
             //isCreatedLogin = true;
         } catch (Exception ex) {

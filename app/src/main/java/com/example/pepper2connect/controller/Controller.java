@@ -57,7 +57,7 @@ public class Controller {
     Resources resources = Resources.getSystem();
 
     final private String strServerIP = "10.0.2.2";// = "127.10.10.15";
-    final private int intPort = 8888; //= 10284;
+    final private int intPort = 7777; //= 10284;
     Decryption decryption = new Decryption();
 
     private User currentUser;
@@ -92,7 +92,7 @@ public class Controller {
         this.mainActivity = mainActivity;
     }
 
-    public void connect2Pepper(String strUsername, String strPassword) {
+    public Client connect2Pepper(String strUsername, String strPassword) {
 
 
         if (!isLoggedIn && !isClientConnected) {
@@ -105,11 +105,16 @@ public class Controller {
                             try {
                                 currentUser = null;
 
-                                client = new Client(this.strServerIP
+                                client = new Client(
+                                        this.strServerIP
                                         , this.intPort
                                         , e.encrypt(strUsername)
                                         , e.encrypt(strPassword)
-                                        , this);
+                                        , this
+                                        , this.mainActivity
+                                );
+
+                                return client;
 
                             } catch (Exception ex) {
                                 String err = "";
@@ -122,11 +127,16 @@ public class Controller {
                 }
             }
         }
+        return null;
     }
 
     /**
      * Fragment_Login
      */
+    public void backToLogin(){
+        mainActivity.backToLogin();
+        isLoggedIn = false;
+    }
 
     public void clientSuccessfulLogin(MessageSystem msgSys) {
         showInformation(msgSys);
@@ -137,7 +147,8 @@ public class Controller {
         if (client != null && isClientConnected && isLoggedIn) {
             showInformation(msgSys);
 
-            appendLogServerCon(msgSys.getType());
+            appendLogServerCon("sent", msgSys.getType());
+
             client.disconnect();
         }
     }
@@ -252,12 +263,10 @@ public class Controller {
     }
 
 
-    public void appendLogServerCon(MessageType msgType) {
-
-
+    public void appendLogServerCon(String strSoR, MessageType msgType) {
 
         String strAppendString = "";
-        strAppendString += "Last Message Type received: \n " + msgType.toString();
+        strAppendString += "Last Message Type"+ strSoR +": \n " + msgType.toString();
 
         if (etLogServerCon != null) {
             appendText2EditText(strAppendString, etLogServerCon);
@@ -280,6 +289,10 @@ public class Controller {
                 strBufferLogServerCon = "";
             }
         }
+    }
+
+    public int getIntRoleID() {
+        return currentUser.getIntRoleID();
     }
 
     /**
@@ -323,6 +336,24 @@ public class Controller {
         }
     }
 
+    public void clearProfile(){
+        if(etProfileTitle != null && etProfileFirstName != null && etProfileLastName != null
+                && etProfileRole != null && etProfileUserName != null && etProfilePassword != null
+                && rb_RConfidentalProfile != null && rb_NConfidentalProfile != null
+        ){
+            etProfileTitle.setText("");
+            etProfileFirstName.setText("");
+            etProfileLastName.setText("");
+            etProfileRole.setText("");
+            etProfileUserName.setText("");
+            etProfilePassword.setText("");
+
+            rb_RConfidentalProfile.setChecked(false);
+            rb_NConfidentalProfile.setChecked(false);
+            ivProfilePicture.setImageDrawable(null);
+        }
+    }
+
 
     public void updateProfile() {
         try {
@@ -348,18 +379,35 @@ public class Controller {
      */
 
 
-    public void appendPatientInformation(MessageSystem messageSystem) {
+    public void appendPatientInformation(MessageSystem msgSys) {
         try {
             if (etPatientInformation != null) {
-                String strAppendString = decryption.decrypt(messageSystem.getStrSystemNotification());
+
+                //String strPatientInfo =
+
+                String strAppendString = decryption.decrypt(msgSys.getStrSystemNotification());
 
                 appendText2EditText(strAppendString, etPatientInformation);
+
+                /** TODO APPEND PATIEN INFORMATION CORRECTLY
+                 *
+                 */
+                /*
+                String[] parts = strAppendString.split("\\|");
+                for (int i = 0; i< parts.length; i++ ){
+
+                    appendText2EditText(parts[i], etPatientInformation);
+
+                }*/
+
+
+
             } else {
                 if (strBufferLogServerCon == null) {
-                    strBufferLogServerCon = stringBuffer(decryption.decrypt(messageSystem.getStrSystemNotification()), strBufferPatientInfo);
+                    strBufferLogServerCon = stringBuffer(decryption.decrypt(msgSys.getStrSystemNotification()), strBufferPatientInfo);
                 } else {
 
-                    strBufferLogServerCon += stringBuffer(decryption.decrypt(messageSystem.getStrSystemNotification()), strBufferPatientInfo);
+                    strBufferLogServerCon += stringBuffer(decryption.decrypt(msgSys.getStrSystemNotification()), strBufferPatientInfo);
                 }
 
             }
@@ -377,6 +425,10 @@ public class Controller {
                 strBufferPatientInfo = "";
             }
         }
+    }
+
+    public void clearPatientInfo(){
+        etPatientInformation.setText("");
     }
 
     /**
@@ -461,6 +513,7 @@ public class Controller {
         spRole.setSelection(1);
         etNuUserName.setText("");
         etNuPassword.setText("");
+        ibNewPicture.setImageDrawable(null);
     }
 
 
@@ -489,6 +542,17 @@ public class Controller {
         client.sendSysMessage(msgSys);
 
         populateSpinner(spUMRole, arrRoles);
+    }
+
+    public void clearUserManagement(){
+
+        allEmployees = null;
+        etUMTitle.setText("");
+        etUMFirstName.setText("");
+        etUMLastName.setText("");
+        etUMPassword.setText("");
+        etUMUserName.setText("");
+        ibUMPicture.setImageDrawable(null);
     }
 
     public void populateArrayAllUsers(MessageUser msgU) {
@@ -536,10 +600,28 @@ public class Controller {
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         } else {
-            MessageD messageD = new MessageD(userCurrentSelectedUm.getIntEmployeeID()
-                    , userCurrentSelectedUm.getIntUserID()
-                    , userCurrentSelectedUm.getIntPictureID());
-            client.sendDeleteMessage(messageD);
+            alertDialogBuilder.setTitle("Trying To Delete User");
+            alertDialogBuilder.setMessage("Are You sure you want to delete this User from the System?");
+            alertDialogBuilder.setPositiveButton(mainActivity.getText(R.string.alertD_YES), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+
+
+                    MessageD messageD = new MessageD(userCurrentSelectedUm.getIntEmployeeID()
+                            , userCurrentSelectedUm.getIntUserID()
+                            , userCurrentSelectedUm.getIntPictureID());
+                    client.sendDeleteMessage(messageD);
+                }
+            });
+            alertDialogBuilder.setNegativeButton(mainActivity.getText(R.string.alertD_NO), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+
+                    Toast.makeText(mainActivity, "You have deleted this User.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
 
 
             allEmployees.remove(userCurrentSelectedUm);
@@ -583,6 +665,12 @@ public class Controller {
         }
 
     }
+
+    /**Fragment Logout
+     *
+     */
+
+
 
 
     /**
@@ -656,8 +744,8 @@ public class Controller {
 
                 , user.getIntConfidentialID()
                 , user.getIntGetsConfidentialInfo());
-        client.sendUpdateMessage(msgU);
 
+        client.sendUpdateMessage(msgU);
     }
 
     private void appendText2EditText(String strAppendText, EditText etAppend) {

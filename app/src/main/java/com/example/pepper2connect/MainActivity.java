@@ -13,21 +13,24 @@ import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.pepper2connect.Service.LocalService;
 import com.example.pepper2connect.controller.Controller;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -35,13 +38,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private final Controller controller = new Controller(this);
+
     private BottomNavigationView bottomNavigationView;
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
-    private final Controller controller = new Controller(this);
 
-    Resources resources = Resources.getSystem();
-    Fragment_Login frgLogin = new Fragment_Login(controller);
+    Fragment_Login frgLogin = new Fragment_Login(controller,this);
     Fragment_Profile frgProfile = new Fragment_Profile(this, controller);
     Fragment_PatientInformation frgPatient = new Fragment_PatientInformation(controller);
     Fragment_ServerConnection frgServer = new Fragment_ServerConnection(controller);
@@ -52,16 +55,18 @@ public class MainActivity extends AppCompatActivity {
     public FragmentManager frgMng = getSupportFragmentManager();
     Fragment activeFragment = frgLogin;
 
-    Button btnTestConnection, btnLogin;
-
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
     private int intRequestCode = -1;
+
+    LocalService mService;
+    boolean mBound = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        checkAndRequestPermissions(this);
         try {
 
             alertDialogBuilder = new AlertDialog.Builder(this);
@@ -87,11 +92,12 @@ public class MainActivity extends AppCompatActivity {
                                 if (!activeFragment.getTag().equals(frgMng.findFragmentByTag("frgLogin").getTag())) {
                                     frgMng.beginTransaction().hide(activeFragment).show(frgLogin).commit();
                                     activeFragment = frgLogin;
+
                                     return true;
                                 }
                                 break;
                             } else {
-                                alertDialogBuilder.setTitle("Allready Logged IN");
+                                alertDialogBuilder.setTitle("Already Logged IN");
                                 alertDialogBuilder.setMessage(getText(R.string.Not_Logged_In_Text));
                                 alertDialogBuilder.setPositiveButton(getText(R.string.alertD_OK), new DialogInterface.OnClickListener() {
                                     @Override
@@ -133,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
                                     frgMng.beginTransaction().hide(activeFragment).show(frgProfile).commit();
                                     activeFragment = frgProfile;
 
+                                    controller.clearProfile();
                                     controller.fillProfile();
 
                                     return true;
@@ -173,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         case R.id.navigation_Logout:
                             if (controller.isLoggedIn) {
+
                                 alertDialogBuilder.setTitle(this.getText(R.string.Log_Out_Title));
                                 alertDialogBuilder.setMessage(this.getText(R.string.Log_Out_Text));
                                 alertDialogBuilder.setPositiveButton(this.getText(R.string.alertD_YES), new DialogInterface.OnClickListener() {
@@ -180,7 +188,18 @@ public class MainActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface arg0, int arg1) {
                                         Toast.makeText(MainActivity.this, getText(R.string.Yes_Log_Out_Text), Toast.LENGTH_LONG).show();
                                         controller.clientLogOut();
+                                        controller.clearProfile();
+
+                                        if(controller.getIntRoleID() == 1){
+                                            frgProfile.intPos = 0;
+                                            controller.clearUserManagement();
+                                            controller.clearNewUser();
+                                        }
+                                        controller.clearPatientInfo();
+
+                                        unbindService(connection);
                                         frgMng.beginTransaction().hide(activeFragment).show(frgLogin).commit();
+
                                     }
                                 });
                                 alertDialogBuilder.setNegativeButton(this.getText(R.string.alertD_NO), new DialogInterface.OnClickListener() {
@@ -212,18 +231,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static boolean checkAndRequestPermissions(final Activity context) {
-        int WExtstorePermission = ContextCompat.checkSelfPermission(context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int cameraPermission = ContextCompat.checkSelfPermission(context,
-                Manifest.permission.CAMERA);
+        int WExtstorePermission = ContextCompat.checkSelfPermission(context
+                , Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        int cameraPermission = ContextCompat.checkSelfPermission(context
+                , Manifest.permission.CAMERA);
+
+        int intNotificationPermission =ContextCompat.checkSelfPermission(context
+                , Manifest.permission.POST_NOTIFICATIONS);
+
         List<String> listPermissionsNeeded = new ArrayList<>();
         if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.CAMERA);
         }
+
         if (WExtstorePermission != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded
                     .add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
+
+        if (intNotificationPermission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded
+                    .add(Manifest.permission.POST_NOTIFICATIONS);
+        }
+
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(context, listPermissionsNeeded
                             .toArray(new String[listPermissionsNeeded.size()]),
@@ -240,18 +271,29 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case REQUEST_ID_MULTIPLE_PERMISSIONS:
-                if (ContextCompat.checkSelfPermission(MainActivity.this,
-                        Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getApplicationContext(),
-                                    "FlagUp Requires Access to Camara.", Toast.LENGTH_SHORT)
-                            .show();
-                } else if (ContextCompat.checkSelfPermission(MainActivity.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getApplicationContext(),
-                            "FlagUp Requires Access to Your Storage.",
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    chooseImage(MainActivity.this);
+
+                if (activeFragment.getTag().equals(frgMng.findFragmentByTag("frgNewUser").getTag())
+                        | activeFragment.getTag().equals(frgMng.findFragmentByTag("frgUserManagement").getTag())) {
+
+                    if (ContextCompat.checkSelfPermission(MainActivity.this,
+
+                            Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(getApplicationContext(),
+                                        "FlagUp Requires Access to Camara.", Toast.LENGTH_SHORT)
+                                .show();
+
+                    } else if (ContextCompat.checkSelfPermission(MainActivity.this,
+
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(getApplicationContext(),
+                                "FlagUp Requires Access to Your Storage.",
+                                Toast.LENGTH_SHORT).show();
+
+                    } else {
+
+                        chooseImage(MainActivity.this);
+
+                    }
                 }
                 break;
         }
@@ -297,7 +339,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
     );
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -353,6 +394,64 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    public void backToLogin(){
+        frgMng.beginTransaction().hide(activeFragment).show(frgLogin).commit();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        try{
+          //  Intent serviceIntent = new Intent();
+
+            // Bind to LocalService
+            Intent intent = new Intent(this, LocalService.class);
+            //intent.setAction("com.google.android.c2dm.intent.RECEIVE");
+            startService(intent);
+            this.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        }catch(Exception ex){
+            String err ="";
+            err =ex.getMessage();
+            err +="";
+
+        }
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+       // unbindService(connection);
+       // mBound = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mService.appClosedDisconnect();
+
+    }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            LocalService.LocalBinder binder = (LocalService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
     public Fragment_Login getFrgLogin() {
         return frgLogin;

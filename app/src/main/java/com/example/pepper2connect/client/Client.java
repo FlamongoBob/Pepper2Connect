@@ -1,11 +1,13 @@
 package com.example.pepper2connect.client;
 
+import com.example.pepper2connect.MainActivity;
 import com.example.pepper2connect.clientmodel.Clientmodel;
 import com.example.pepper2connect.controller.Controller;
 import com.example.pepper2connect.messages.*;
 
 public class Client {
     private Clientmodel cModel;
+    private Controller controller;
 
     /**
      * Constructor for the client class.
@@ -17,9 +19,12 @@ public class Client {
      * @param controller
      */
 
-    public Client(String strIP, int intPort, String strUserName, String strPassword, Controller controller) {
+    public Client(String strIP, int intPort, String strUserName, String strPassword, Controller controller, MainActivity mainActivity) {
+        if (this.controller ==null){
+            this.controller = controller;
+        }
         if (!controller.isClientConnected) {
-            cModel = new Clientmodel(controller);
+            cModel = new Clientmodel(controller, mainActivity);
             cModel.StartServer(strUserName, strPassword,strIP,intPort);
 
             //cModel.connect(strIP, intPort, strName, strPassword);
@@ -47,14 +52,17 @@ public class Client {
     public void sendSysMessage(MessageSystem messageSystem) {
 
         cModel.sendMessage(messageSystem);
+        controller.appendLogServerCon("sent", messageSystem.getType());
     }
     public void sendUpdateMessage(MessageU msgU) {
 
         cModel.sendMessage(msgU);
+        controller.appendLogServerCon("sent", msgU.getType());
     }
 
     public void sendDeleteMessage(MessageD msgD) {
             cModel.sendMessage(msgD);
+        controller.appendLogServerCon("sent", msgD.getType());
 
     }
 

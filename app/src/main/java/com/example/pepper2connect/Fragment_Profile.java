@@ -67,27 +67,19 @@ public class Fragment_Profile extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // Toast.makeText(mainActivity, mainActivity.getText(R.string.last_message_rec_Text), Toast.LENGTH_SHORT).show();
-
-      /*  if (activeFragment == null) {
-            activeFragment = mainActivity.getActiveFragment();
-        }
-
-        if (frgMng == null) {
-            frgMng = mainActivity.getFrgMng();
-           // frgMng.beginTransaction().add(R.id.container, fragment_newUser, "frgNewUser").hide(fragment_newUser).commit();
-        }
-        */
-
-
-        switch (item.getItemId()) {
+          switch (item.getItemId()) {
             case R.id.New_User:
                 try {
+                    if (controller.getIntRoleID() == 1) {
                     if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgNewUser").getTag())) {
                         mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_newUser).commit();
                         mainActivity.activeFragment = mainActivity.fragment_newUser;
                         return true;
                     }
+
+                }else {
+                return false;
+            }
 
 
                     return false;
@@ -97,16 +89,38 @@ public class Fragment_Profile extends Fragment {
                 }
             case R.id.UserManagement:
                 try {
-                    if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgUserManagement").getTag())) {
-                        mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_userManagement).commit();
-                        mainActivity.activeFragment = mainActivity.fragment_userManagement;
+                    if (controller.getIntRoleID() == 1) {
+                        if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgProfile").getTag())) {
+                            mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.frgProfile).commit();
+                            mainActivity.activeFragment = mainActivity.frgProfile;
 
-                        controller.getAllEmployeeData();
+                            controller.getAllEmployeeData();
 
-                        intPos = controller.starFillUserManagement(0);
-                        return true;
+                            intPos = controller.starFillUserManagement(0);
+                            return true;
+                        }
+                    }else {
+                        return false;
                     }
+
+                } catch (Exception ex) {
+                    String err = ex.getMessage();
+                    err += "";
+                }
+            case R.id.Profile:
+                try {
+                        if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgUserManagement").getTag())) {
+                            mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_userManagement).commit();
+                            mainActivity.activeFragment = mainActivity.fragment_userManagement;
+
+                            controller.getAllEmployeeData();
+
+                            intPos = controller.starFillUserManagement(0);
+                            return true;
+                        }
+
                     return false;
+
                 } catch (Exception ex) {
                     String err = ex.getMessage();
                     err += "";
@@ -174,8 +188,6 @@ public class Fragment_Profile extends Fragment {
             //isCreatedProfile = false;
         }
     }
-
-
 
 
 }
