@@ -404,11 +404,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         try{
-          //  Intent serviceIntent = new Intent();
-
-            // Bind to LocalService
             Intent intent = new Intent(this, LocalService.class);
-            //intent.setAction("com.google.android.c2dm.intent.RECEIVE");
             startService(intent);
             this.bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
@@ -424,14 +420,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-       // unbindService(connection);
-       // mBound = false;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mService.appClosedDisconnect();
+
+        mBound = false;
+        unbindService(connection);
 
     }
 
