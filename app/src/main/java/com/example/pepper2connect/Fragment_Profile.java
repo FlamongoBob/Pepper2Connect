@@ -87,16 +87,14 @@ public class Fragment_Profile extends Fragment {
                     String err = ex.getMessage();
                     err += "";
                 }
-            case R.id.UserManagement:
+            case R.id.Profile:
                 try {
                     if (controller.getIntRoleID() == 1) {
                         if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgProfile").getTag())) {
                             mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.frgProfile).commit();
                             mainActivity.activeFragment = mainActivity.frgProfile;
 
-                            controller.getAllEmployeeData();
-
-                            intPos = controller.starFillUserManagement(0);
+                            controller.fillProfile();
                             return true;
                         }
                     }else {
@@ -107,7 +105,7 @@ public class Fragment_Profile extends Fragment {
                     String err = ex.getMessage();
                     err += "";
                 }
-            case R.id.Profile:
+            case R.id.UserManagement:
                 try {
                         if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgUserManagement").getTag())) {
                             mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_userManagement).commit();

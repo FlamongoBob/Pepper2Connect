@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     Fragment_Profile frgProfile = new Fragment_Profile(this, controller);
     Fragment_PatientInformation frgPatient = new Fragment_PatientInformation(controller);
     Fragment_ServerConnection frgServer = new Fragment_ServerConnection(controller);
-
     Fragment_NewUser fragment_newUser = new Fragment_NewUser(controller, this);
     Fragment_UserManagement fragment_userManagement = new Fragment_UserManagement(controller, this);
 
