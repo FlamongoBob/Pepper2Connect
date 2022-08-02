@@ -190,7 +190,7 @@
     </ScrollView>
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/bottomNavigationView2"
+        android:id="@+id/optionNavigationMenu"
         android:layout_width="match_parent"
         android:layout_height="53dp"
         app:itemIconTint="@color/black"

@@ -46,13 +46,13 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Controller {
-    public static volatile Boolean isClientConnected = false;
-    public static volatile Boolean isLoggedIn = false;
+    //public static volatile Boolean isClientConnected = false;
+   // public static volatile Boolean isLoggedIn = false;
     /**
      * TODO COMMENT isClientConnected, isLoggedIn
      */
-    //public static volatile Boolean isClientConnected = true;
-    //public static volatile Boolean isLoggedIn = true;
+    public static volatile Boolean isClientConnected = true;
+    public static volatile Boolean isLoggedIn = true;
     private Client client;
     Resources resources = Resources.getSystem();
 
@@ -630,6 +630,15 @@ public class Controller {
     }
 
     public void updateEmployee() {
+
+        /**TODO CORRECT UPDATE*/
+
+        userCurrentSelectedUm.setStrTitle(etUMTitle.getText().toString());
+        userCurrentSelectedUm.setStrFirstname(etUMFirstName.getText().toString());
+        userCurrentSelectedUm.setStrLastname(etUMLastName.getText().toString());
+
+        userCurrentSelectedUm.setStrPassword(etUMPassword.getText().toString());
+
 
         sendUpdateUser(userCurrentSelectedUm);
     }

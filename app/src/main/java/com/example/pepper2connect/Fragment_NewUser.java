@@ -109,6 +109,7 @@ public class Fragment_NewUser extends Fragment {
         controller.setRb_Nu_RConfidentalInfo(rb_Nu_RConfidentalInfo);
 
         RadioButton rb_Nu_NConfidentalInfo = vRoot.findViewById(R.id.rb_Nu_NConfidentalInfo);
+        rb_Nu_NConfidentalInfo.setChecked(true);
         controller.setRb_Nu_NConfidentalInfo(rb_Nu_NConfidentalInfo);
 
         Spinner spNuRole = vRoot.findViewById(R.id.spNuRole);

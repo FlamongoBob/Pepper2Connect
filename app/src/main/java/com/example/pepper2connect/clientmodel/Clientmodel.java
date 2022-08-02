@@ -66,10 +66,17 @@ public class Clientmodel {
                                 controller.disconnectFromPepper((MessageSystem) msg);
                                 controller.backToLogin();
 
+                            } else if (msg.getType().equals(MessageType.Disconnect)) {
+
+                                shutDown();
+                                controller.backToLogin();
+
                             } else if (msg.getType().equals(MessageType.Successful_LogIn)) {
 
                                 controller.clientSuccessfulLogin((MessageSystem) msg);
 
+                                shutDown();
+                                controller.backToLogin();
                             } else if (msg.getType().equals(MessageType.LogOut)) {
 
                                 controller.disconnectFromPepper((MessageSystem) msg);
