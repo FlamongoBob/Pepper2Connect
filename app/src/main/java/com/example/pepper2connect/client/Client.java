@@ -52,17 +52,17 @@ public class Client {
     public void sendSysMessage(MessageSystem messageSystem) {
 
         cModel.sendMessage(messageSystem);
-        controller.appendLogServerCon("sent", messageSystem.getType());
+        controller.appendLogServerCon(" sent", messageSystem.getType());
     }
     public void sendUpdateMessage(MessageU msgU) {
 
         cModel.sendMessage(msgU);
-        controller.appendLogServerCon("sent", msgU.getType());
+        controller.appendLogServerCon(" sent", msgU.getType());
     }
 
     public void sendDeleteMessage(MessageD msgD) {
             cModel.sendMessage(msgD);
-        controller.appendLogServerCon("sent", msgD.getType());
+        controller.appendLogServerCon(" sent", msgD.getType());
 
     }
 

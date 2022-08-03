@@ -74,6 +74,7 @@ public class Fragment_Profile extends Fragment {
                     if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgNewUser").getTag())) {
                         mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_newUser).commit();
                         mainActivity.activeFragment = mainActivity.fragment_newUser;
+                        controller.setNURoles();
                         return true;
                     }
 
@@ -87,6 +88,7 @@ public class Fragment_Profile extends Fragment {
                     String err = ex.getMessage();
                     err += "";
                 }
+                break;
             case R.id.Profile:
                 try {
                     if (controller.getIntRoleID() == 1) {
@@ -105,8 +107,10 @@ public class Fragment_Profile extends Fragment {
                     String err = ex.getMessage();
                     err += "";
                 }
+                break;
             case R.id.UserManagement:
                 try {
+                    if (controller.getIntRoleID() == 1) {
                         if (!mainActivity.activeFragment.getTag().equals(mainActivity.frgMng.findFragmentByTag("frgUserManagement").getTag())) {
                             mainActivity.frgMng.beginTransaction().hide(mainActivity.activeFragment).show(mainActivity.fragment_userManagement).commit();
                             mainActivity.activeFragment = mainActivity.fragment_userManagement;
@@ -117,16 +121,19 @@ public class Fragment_Profile extends Fragment {
                             return true;
                         }
 
-                    return false;
-
+                    }else {
+                        return false;
+                    }
                 } catch (Exception ex) {
                     String err = ex.getMessage();
                     err += "";
                 }
+                break;
             default:
 
                 return super.onOptionsItemSelected(item);
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public void initiateProfileControls(View vRoot) {

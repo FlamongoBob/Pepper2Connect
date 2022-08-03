@@ -34,13 +34,13 @@ public class LocalService extends Service {
         return binder;
     }
 
-    public void connect2Pepper(String strUsername, String strPassword,Controller controller) {
+    public void connect2Pepper(String strUsername, String strPassword,Controller controller, int intPort, String strIpAddress) {
 
         if(this.controller==null){
             this.controller = controller;
         }
 
-        client = controller.connect2Pepper(strUsername, strPassword);
+        client = controller.connect2Pepper(strUsername, strPassword, intPort, strIpAddress);
     }
 
     public void sendMessage(MessageSystem messageSystem) {

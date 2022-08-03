@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import com.example.pepper2connect.controller.Controller;
@@ -18,7 +19,7 @@ public class Fragment_UserManagement extends Fragment {
 
     MainActivity mainActivity;
     Controller controller;
-    int intPos = -1;
+    int intPos = 0;
 
     public Fragment_UserManagement(Controller controller, MainActivity mainActivity) {
         this.mainActivity = mainActivity;
@@ -69,6 +70,12 @@ public class Fragment_UserManagement extends Fragment {
         Spinner spUMRole = vRoot.findViewById(R.id.spUMRole);
         controller.setSpUMRole(spUMRole);
 
+        RadioButton rb_RConfidentialUM = vRoot.findViewById(R.id.rb_RConfidentialUM);
+        controller.setRb_RConfidentialUM(rb_RConfidentialUM);
+
+        RadioButton rb_NConfidentialUM = vRoot.findViewById(R.id.rb_NConfidentialUM);
+        controller.setRb_NConfidentialUM(rb_NConfidentialUM);
+
 
         Button btnUMSaveChanges = vRoot.findViewById(R.id.btnUMSaveChanges);
         btnUMSaveChanges.setOnClickListener(view -> {
@@ -83,13 +90,13 @@ public class Fragment_UserManagement extends Fragment {
         Button btnUMPrevious = vRoot.findViewById(R.id.btnUMPrevious);
         btnUMPrevious.setOnClickListener(view -> {
             intPos = intPos-1;
-            controller.starFillUserManagement(intPos);
+            intPos = controller.starFillUserManagement(intPos);
         });
 
         Button btnUMNext = vRoot.findViewById(R.id.btnUMNext);
         btnUMNext.setOnClickListener(view -> {
             intPos = intPos+1;
-            controller.starFillUserManagement(intPos);
+            intPos = controller.starFillUserManagement(intPos);
         });
 
     }

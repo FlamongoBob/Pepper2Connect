@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     public FragmentManager frgMng = getSupportFragmentManager();
     Fragment activeFragment = frgLogin;
 
-    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 102;
     private int intRequestCode = -1;
 
     LocalService mService;
@@ -236,6 +236,9 @@ public class MainActivity extends AppCompatActivity {
         int cameraPermission = ContextCompat.checkSelfPermission(context
                 , Manifest.permission.CAMERA);
 
+        int RextStorePermission = ContextCompat.checkSelfPermission(context
+                , Manifest.permission.READ_EXTERNAL_STORAGE);
+
         int intNotificationPermission =ContextCompat.checkSelfPermission(context
                 , Manifest.permission.POST_NOTIFICATIONS);
 
@@ -247,6 +250,10 @@ public class MainActivity extends AppCompatActivity {
         if (WExtstorePermission != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded
                     .add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (RextStorePermission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded
+                    .add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
 
         if (intNotificationPermission != PackageManager.PERMISSION_GRANTED) {
@@ -275,17 +282,22 @@ public class MainActivity extends AppCompatActivity {
                         | activeFragment.getTag().equals(frgMng.findFragmentByTag("frgUserManagement").getTag())) {
 
                     if (ContextCompat.checkSelfPermission(MainActivity.this,
-
                             Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(getApplicationContext(),
-                                        "FlagUp Requires Access to Camara.", Toast.LENGTH_SHORT)
+                                        "Pepper2Connect Requires Access to Camara.", Toast.LENGTH_SHORT)
                                 .show();
+
+                    } else if (ContextCompat.checkSelfPermission(MainActivity.this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(getApplicationContext(),
+                                "Pepper2Connect Requires Access to Your Storage.",
+                                Toast.LENGTH_SHORT).show();
 
                     } else if (ContextCompat.checkSelfPermission(MainActivity.this,
 
                             Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(getApplicationContext(),
-                                "FlagUp Requires Access to Your Storage.",
+                                "Pepper2Connect Requires Access to Your Storage.",
                                 Toast.LENGTH_SHORT).show();
 
                     } else {
@@ -350,9 +362,18 @@ public class MainActivity extends AppCompatActivity {
                             Bundle extras = data.getExtras();
                             Bitmap selectedImage = (Bitmap) extras.get("data");
 
-                            controller.setStrNewUserPicture(controller.BitMapToString(selectedImage));
+                            controller.setStrNewUserPicture(
 
-                            controller.setIBNewPicture((Bitmap) data.getExtras().get("data"), findViewById(R.id.ibNewPicture));
+                                    controller.BitMapToString(selectedImage)
+
+                            );
+
+                            controller.setIBNewPicture(
+
+                                    (Bitmap) extras.get("data")
+                                    , findViewById(R.id.ibNewPicture)
+
+                            );
 
 
                         } catch (Exception ex) {

@@ -59,7 +59,7 @@ public class Clientmodel {
 
                         if (msg instanceof MessageSystem) {
 
-                            controller.appendLogServerCon("received", msg.getType());
+                            controller.appendLogServerCon(" received", msg.getType());
 
                             if (msg.getType().equals(MessageType.Unsuccessful_LogIn)) {
 
@@ -75,8 +75,6 @@ public class Clientmodel {
 
                                 controller.clientSuccessfulLogin((MessageSystem) msg);
 
-                                shutDown();
-                                controller.backToLogin();
                             } else if (msg.getType().equals(MessageType.LogOut)) {
 
                                 controller.disconnectFromPepper((MessageSystem) msg);
@@ -96,36 +94,33 @@ public class Clientmodel {
                                         , "The Patient is ready and there is information available in the Patient Information Tab");
 
                                 controller.appendPatientInformation((MessageSystem) msg);
-                                controller.appendLogServerCon("received", msg.getType());
-
+                                controller.appendLogServerCon(" received", msg.getType());
                             }
                         }
 
                         if (msg.getType().equals(MessageType.User)) {
 
                             controller.fillCurrentUser((MessageUser) msg);
-                            controller.appendLogServerCon("received", msg.getType());
+                            controller.appendLogServerCon(" received", msg.getType());
 
                         } else if (msg.getType().equals(MessageType.Error)) {
 
                             controller.showInformation(msg);
-                            controller.appendLogServerCon("received", msg.getType());
+                            controller.appendLogServerCon(" received", msg.getType());
 
                         } else if (msg.getType().equals(MessageType.Test)) {
-                            controller.appendLogServerCon("received", msg.getType());
+                            controller.appendLogServerCon(" received", msg.getType());
 
                         } else if (msg.getType().equals(MessageType.AllUser)) {
 
                             controller.populateArrayAllUsers((MessageUser) msg);
-                            controller.appendLogServerCon("received", msg.getType());
+                            controller.appendLogServerCon(" received", msg.getType());
 
                         } else if (msg.getType().equals(MessageType.Roles)) {
 
                             controller.populateArrayListRoles((MessageRoles) msg);
-                            controller.appendLogServerCon("received", msg.getType());
+                            controller.appendLogServerCon(" received", msg.getType());
                         }
-
-
                         // If we're done with the ExecutorService, shut it down.
                         // Shut it down whenever everything is completed and it is not needed anymore.)
                         if (!controller.isClientConnected) {
@@ -159,17 +154,9 @@ public class Clientmodel {
                     while (controller.isClientConnected) {
 
                         Message msg = Message.receive(socket);
-                        if(msg != null) {
-                            if (msg.getType().equals(MessageType.Test)) {
-                                responseTimer();
-                            } else {
+                        if (msg != null) {
                                 listener.onProcessed(msg);
-
-                            }
-                        }else {
-                            /*** TODO Unexpected Disconnect or Server is not Started
-                             *
-                             */
+                        } else {
 
                             MessageSystem msgSys = new MessageSystem("You have not been connected to the Server. " +
                                     "Please make sure you are in the correct Wifi-Network and verify that the Server has been started");

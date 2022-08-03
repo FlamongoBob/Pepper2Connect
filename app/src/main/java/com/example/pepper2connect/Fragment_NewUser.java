@@ -113,7 +113,7 @@ public class Fragment_NewUser extends Fragment {
         controller.setRb_Nu_NConfidentalInfo(rb_Nu_NConfidentalInfo);
 
         Spinner spNuRole = vRoot.findViewById(R.id.spNuRole);
-        controller.setSpRole(spNuRole);
+        controller.setSpNuRole(spNuRole);
 
         Button btnAddNewUser = vRoot.findViewById(R.id.btnAddNewUser);
         btnAddNewUser.setOnClickListener(view -> {
@@ -127,10 +127,10 @@ public class Fragment_NewUser extends Fragment {
 
         //Testing
 
-        etNuTitle.setText("Dr. Med. FMZ");
-        etNuFirstName.setText("Raphael");
-        etNuLastName.setText("Jungmair");
-        etNuPassword.setText("Admin");
+        etNuTitle.setText("adgf");
+        etNuFirstName.setText("asd");
+        etNuLastName.setText("jehs");
+        etNuPassword.setText("asd");
 
 
     }

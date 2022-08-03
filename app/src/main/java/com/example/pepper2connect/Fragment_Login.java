@@ -21,7 +21,7 @@ public class Fragment_Login extends Fragment {
     Button btnLogin;
     MainActivity mainActivity;
 
-    public Fragment_Login(Controller controller,MainActivity mainActivity) {
+    public Fragment_Login(Controller controller, MainActivity mainActivity) {
         // Required empty public constructor
         this.controller = controller;
         this.mainActivity = mainActivity;
@@ -43,9 +43,13 @@ public class Fragment_Login extends Fragment {
     }
 
 
-
     public void initiateLoginControls(View vRoot) {
         try {
+
+
+            EditText etLoginPort = vRoot.findViewById(R.id.etLoginPort);
+            EditText etLoginIpAddress = vRoot.findViewById(R.id.etLoginIpAddress);
+
 
             EditText etLoginUserName = vRoot.findViewById(R.id.etLoginUserName);
             controller.setEtLoginUsername(etLoginUserName);
@@ -60,10 +64,13 @@ public class Fragment_Login extends Fragment {
                 TextView tvLoginInformation = vRoot.findViewById(R.id.tvLoginInformation);
                 controller.setTvLoginInformation(tvLoginInformation);
 
-                if(mainActivity.mBound) {
+                if (mainActivity.mBound) {
                     mainActivity.mService.connect2Pepper(etLoginUserName.getText().toString()
                             , etLoginPassword.getText().toString()
-                            , this.controller);
+                            , this.controller
+                            , Integer.parseInt(etLoginPort.getText().toString())
+                            , etLoginIpAddress.getText().toString()
+                    );
                 }
 
             });
@@ -74,7 +81,6 @@ public class Fragment_Login extends Fragment {
             //isCreatedLogin = false;
         }
     }
-
 
 
 }

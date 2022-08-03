@@ -169,7 +169,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/spUMRole">
 
                 <RadioButton
-                    android:id="@+id/rb_ReceiveUM"
+                    android:id="@+id/rb_RConfidentialUM"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="60dp"
@@ -178,7 +178,7 @@
                     tools:layout_editor_absoluteY="461dp" />
 
                 <RadioButton
-                    android:id="@+id/rb_Not_ReceiveUM"
+                    android:id="@+id/rb_NConfidentialUM"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="60dp"

@@ -1,13 +1,11 @@
 package com.example.pepper2connect.controller;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Build;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Base64;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.NotificationCompat;
 
 import com.example.pepper2connect.Crypto.Decryption;
 import com.example.pepper2connect.Crypto.Encryption;
@@ -46,18 +43,20 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Controller {
-    //public static volatile Boolean isClientConnected = false;
-   // public static volatile Boolean isLoggedIn = false;
+    public static volatile Boolean isClientConnected = false;
+    public static volatile Boolean isLoggedIn = false;
     /**
      * TODO COMMENT isClientConnected, isLoggedIn
      */
-    public static volatile Boolean isClientConnected = true;
-    public static volatile Boolean isLoggedIn = true;
+    //public static volatile Boolean isClientConnected = true;
+    //public static volatile Boolean isLoggedIn = true;
     private Client client;
     Resources resources = Resources.getSystem();
 
-    final private String strServerIP = "10.0.2.2";// = "127.10.10.15";
-    final private int intPort = 7777; //= 10284;
+    //final private String strIPAdress  = "127.10.10.15"; //= "10.0.2.15";
+
+    final private String strServerIP ="192.168.1.45";// "10.0.2.2";// = "127.10.10.15";
+    final private int intPort = 10284; // = 6666; 7777;
     Decryption decryption = new Decryption();
 
     private User currentUser;
@@ -72,15 +71,6 @@ public class Controller {
     MainActivity mainActivity;
 
 
-    //New User Controlls
-    EditText etNuFirstName, etNuTitle, etNuLastName, etNuPassword, etNuUserName;
-    String strNewUserPicture;
-    Spinner spRole;
-    int intNuRoleID, intNuTitleID;
-    ImageButton ibNewPicture;
-    RadioGroup rg_Nu_Confidential;
-    RadioButton rb_Nu_RConfidentalInfo, rb_Nu_NConfidentalInfo;
-    //----
 
 
     private AlertDialog.Builder alertDialogBuilder;
@@ -92,7 +82,7 @@ public class Controller {
         this.mainActivity = mainActivity;
     }
 
-    public Client connect2Pepper(String strUsername, String strPassword) {
+    public Client connect2Pepper(String strUsername, String strPassword, int intPort, String strIpAddress) {
 
 
         if (!isLoggedIn && !isClientConnected) {
@@ -104,10 +94,20 @@ public class Controller {
 
                             try {
                                 currentUser = null;
-
+                                /*
                                 client = new Client(
                                         this.strServerIP
                                         , this.intPort
+                                        , e.encrypt(strUsername)
+                                        , e.encrypt(strPassword)
+                                        , this
+                                        , this.mainActivity
+                                );
+                                */
+
+                                client = new Client(
+                                        strIpAddress
+                                        , intPort
                                         , e.encrypt(strUsername)
                                         , e.encrypt(strPassword)
                                         , this
@@ -147,7 +147,7 @@ public class Controller {
         if (client != null && isClientConnected && isLoggedIn) {
             showInformation(msgSys);
 
-            appendLogServerCon("sent", msgSys.getType());
+            appendLogServerCon(" sent", msgSys.getType());
 
             client.disconnect();
         }
@@ -220,7 +220,7 @@ public class Controller {
                         etNuFirstName.setText("");
                         etNuLastName.setText("");
                         strNewUserPicture = "";
-                        spRole.setSelection(0);
+                        spNuRole.setSelection(0);
                         etNuUserName.setText("");
                         etNuPassword.setText("");
 
@@ -389,7 +389,7 @@ public class Controller {
 
                 appendText2EditText(strAppendString, etPatientInformation);
 
-                /** TODO APPEND PATIEN INFORMATION CORRECTLY
+                /** TODO APPEND PATIENt INFORMATION CORRECTLY
                  *
                  */
                 /*
@@ -435,6 +435,15 @@ public class Controller {
      * Fraggment NewUser
      */
 
+    //New User Controlls
+    EditText etNuFirstName, etNuTitle, etNuLastName, etNuPassword, etNuUserName;
+    String strNewUserPicture;
+    Spinner spNuRole;
+    int intNuRoleID, intNuTitleID;
+    ImageButton ibNewPicture;
+    RadioGroup rg_Nu_Confidential;
+    RadioButton rb_Nu_RConfidentalInfo, rb_Nu_NConfidentalInfo;
+    //----
     Encryption e = new Encryption();
 
     public void addNewUser() {
@@ -443,7 +452,7 @@ public class Controller {
         try {
 
             int intCheckedID = rg_Nu_Confidential.getCheckedRadioButtonId();
-
+            int idh = (int) spNuRole.getSelectedItemId();
 
             if (intCheckedID == rb_Nu_NConfidentalInfo.getId()) {
                 msgI = new MessageI(e.encrypt(etNuTitle.getText().toString())
@@ -452,7 +461,7 @@ public class Controller {
 
                         , e.encrypt(newUserPictureChecker(strNewUserPicture))
 
-                        , (int) spRole.getSelectedItemId()
+                        ,( (int) spNuRole.getSelectedItemId())+1
 
                         , e.encrypt(etNuUserName.getText().toString())
                         , e.encrypt(etNuPassword.getText().toString())
@@ -466,7 +475,7 @@ public class Controller {
 
                         , e.encrypt(newUserPictureChecker(strNewUserPicture))
 
-                        , (int) spRole.getSelectedItemId()
+                        ,( (int) spNuRole.getSelectedItemId())+1
 
                         , e.encrypt(etNuUserName.getText().toString())
                         , e.encrypt(etNuPassword.getText().toString())
@@ -490,6 +499,10 @@ public class Controller {
 
 
     }
+    public void setNURoles(){
+        populateSpinner(spNuRole, arrRoles);
+
+    }
 
     public String newUserPictureChecker(String strNewUserPicture) {
         String strEmpty = "NoPicture";
@@ -510,7 +523,7 @@ public class Controller {
         etNuFirstName.setText("");
         etNuLastName.setText("");
         strNewUserPicture = "";
-        spRole.setSelection(1);
+        spNuRole.setSelection(1);
         etNuUserName.setText("");
         etNuPassword.setText("");
         ibNewPicture.setImageDrawable(null);
@@ -558,23 +571,30 @@ public class Controller {
     public void populateArrayAllUsers(MessageUser msgU) {
         if (allEmployees == null) {
             allEmployees = new ArrayList<>();
-        } else {
-            allEmployees.add(messageUserToUser(msgU));
         }
+            allEmployees.add(
+                    messageUserToUser(msgU)
+            );
+        starFillUserManagement(0);
+
     }
 
+
+
     public int starFillUserManagement(int intPos) {
-        if (intPos >= allEmployees.size()) {
-            intPos = 0;
+        if(allEmployees!=null && allEmployees.size()>=1) {
+            if (intPos >= allEmployees.size()) {
+                intPos = 0;
+            }
+
+            if (intPos < 0) {
+
+                intPos = allEmployees.size()-1;
+            }
+
+            userCurrentSelectedUm = allEmployees.get(intPos);
+            populateUserManagementControlls(allEmployees.get(intPos));
         }
-
-        if (intPos < 0) {
-
-            intPos = 0;
-        }
-
-        userCurrentSelectedUm = allEmployees.get(intPos);
-        populateUserManagementControlls(allEmployees.get(intPos));
         return intPos;
     }
 
@@ -631,7 +651,7 @@ public class Controller {
 
     public void updateEmployee() {
 
-        /**TODO CORRECT UPDATE*/
+
 
         userCurrentSelectedUm.setStrTitle(etUMTitle.getText().toString());
         userCurrentSelectedUm.setStrFirstname(etUMFirstName.getText().toString());
@@ -645,32 +665,39 @@ public class Controller {
 
 
     private void populateUserManagementControlls(User user) {
-        etUMTitle.setText(user.getStrTitle());
-        etUMFirstName.setText(user.getStrFirstname());
-        etUMLastName.setText(user.getStrLastname());
-        String strPicture = user.getStrPicture();
+        try {
+            etUMTitle.setText(user.getStrTitle());
+            etUMFirstName.setText(user.getStrFirstname());
+            etUMLastName.setText(user.getStrLastname());
+            String strPicture = user.getStrPicture();
 
+            if (!strPicture.substring(0, 9).equals("NoPicture")) {
+                setIBNewPicture(
+                        StringToBitMap(strPicture)
+                        , ibUMPicture
+                );
+            }
 
-        setIBNewPicture(
-                StringToBitMap(strPicture)
-                , ibUMPicture
-        );
+            etUMPassword.setText(user.getStrPassword());
+            etUMUserName.setText(user.getStrUserName());
 
-        etUMPassword.setText(user.getStrPassword());
-        etUMUserName.setText(user.getStrUserName());
+            if (user.getIntRoleID() == 2) {
+                spUMRole.setSelection(arrRoles.indexOf("User"));
+            } else {
 
-        if (user.getIntRoleID() == 2) {
-            spUMRole.setSelection(arrRoles.indexOf("User"));
-        } else {
+                spUMRole.setSelection(arrRoles.indexOf("Admin"));
+            }
 
-            spUMRole.setSelection(arrRoles.indexOf("Admin"));
-        }
+            if (user.getIntConfidentialID() == 1) {
+                rb_RConfidentialUM.setChecked(true);
+            } else {
 
-        if (user.getIntConfidentialID() == 1) {
-            rb_RConfidentialUM.setChecked(true);
-        } else {
-
-            rb_NConfidentialUM.setChecked(true);
+                rb_NConfidentialUM.setChecked(true);
+            }
+        }catch (Exception ex){
+            String err="";
+            err = ex.getMessage();
+            err+="";
         }
 
     }
@@ -799,9 +826,15 @@ public class Controller {
 
     public void setIBNewPicture(Bitmap bmNewUserPicture, ImageButton imageButton) {
         ImageView iv = imageButton;
-        if (ibNewPicture != null && bmNewUserPicture != null) {
-            this.ibNewPicture.setImageBitmap(bmNewUserPicture);
-        }
+      //  if (ibNewPicture != null && bmNewUserPicture != null) {
+        //    this.ibNewPicture.setImageBitmap(bmNewUserPicture);
+        //}
+
+        BitmapDrawable bmpDraw = new BitmapDrawable(mainActivity.getResources(), bmNewUserPicture);
+        ibNewPicture.setBackground(bmpDraw);
+
+
+
     }
 
 
@@ -1016,9 +1049,9 @@ public class Controller {
         }
     }
 
-    public void setSpRole(Spinner spRole) {
-        if (spRole != null) {
-            this.spRole = spRole;
+    public void setSpNuRole(Spinner spNuRole) {
+        if (spNuRole != null) {
+            this.spNuRole = spNuRole;
         }
     }
 
